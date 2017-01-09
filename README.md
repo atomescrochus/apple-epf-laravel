@@ -50,6 +50,7 @@ If you discover any security related issues, please email hello@appstract.team i
 - [All Contributors](../../contributors)
 
 ## About Appstract
+
 Appstract is a small team from The Netherlands. <3 Laravel, Vue and other awesome tools.
 
 ## Buy Us a Beer
