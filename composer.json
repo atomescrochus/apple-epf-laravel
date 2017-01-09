@@ -1,17 +1,17 @@
 {
-    "name": "spatie/:package_name",
+    "name": "appstract/:package_name",
     "description": ":package_description",
     "keywords": [
-        "spatie",
+        "appstract",
         ":package_name"
     ],
-    "homepage": "https://github.com/spatie/:package_name",
+    "homepage": "https://github.com/appstract/:package_name",
     "license": "MIT",
     "authors": [
         {
             "name": ":author_name",
             "email": ":author_email",
-            "homepage": "https://spatie.be",
+            "homepage": "https://appstract.team",
             "role": "Developer"
         }
     ],
@@ -23,12 +23,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Spatie\\Skeleton\\": "src"
+            "Appstract\\Skeleton\\": "src"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Spatie\\Skeleton\\Test\\": "tests"
+            "Appstract\\Skeleton\\Test\\": "tests"
         }
     },
     "scripts": {
