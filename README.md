@@ -26,10 +26,6 @@ $skeleton = new Appstract\Skeleton();
 echo $skeleton->echoPhrase('Hello, Appstract!');
 ```
 
-## Changelog
-
-Please see [CHANGELOG](CHANGELOG.md) for more information what has changed recently.
-
 ## Testing
 
 ``` bash
@@ -53,7 +49,7 @@ If you discover any security related issues, please email hello@appstract.team i
 
 Appstract is a small team from The Netherlands. <3 Laravel, Vue and other awesome tools.
 
-## Buy Us a Beer
+## Buy Us A Beer
 
 Would be awesome if you would [buy u a beer](https://paypal.me/:name)! :)
 
