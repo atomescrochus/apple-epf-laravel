@@ -30,7 +30,7 @@ $ composer test
 
 ## Contributing
 
-Contributions is welcome, [thanks to y'all](https://github.com/appstract/:package_name/graphs/contributors) :)
+Contributions are welcome, [thanks to y'all](https://github.com/appstract/:package_name/graphs/contributors) :)
 
 ## About Appstract
 
