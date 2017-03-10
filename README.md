@@ -15,6 +15,19 @@ You can install the package via composer:
 composer require appstract/:package_name
 ```
 
+### Provider
+
+Then add the ServiceProvider to your `config/app.php` file:
+
+```
+'providers' => [
+    ...
+
+    Appstract\Skeleton\SkeletonServiceProvider::class
+
+    ....
+```
+
 ## Usage
 
 ``` php
