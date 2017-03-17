@@ -19,13 +19,14 @@ composer require appstract/:package_name
 
 Then add the ServiceProvider to your `config/app.php` file:
 
-```
+``` php
 'providers' => [
     ...
 
     Appstract\Skeleton\SkeletonServiceProvider::class
 
     ....
+]
 ```
 
 ## Usage
