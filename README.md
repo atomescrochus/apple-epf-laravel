@@ -11,7 +11,7 @@ This is where your description should go. Try and limit it to a paragraph or two
 
 You can install the package via composer:
 
-``` bash
+```bash
 composer require appstract/:package_name
 ```
 
@@ -19,7 +19,7 @@ composer require appstract/:package_name
 
 Then add the ServiceProvider to your `config/app.php` file:
 
-``` php
+```php
 'providers' => [
     ...
 
@@ -31,14 +31,14 @@ Then add the ServiceProvider to your `config/app.php` file:
 
 ## Usage
 
-``` php
+```php
 $skeleton = new Appstract\Skeleton();
 echo $skeleton->echoPhrase('Hello, Appstract!');
 ```
 
 ## Testing
 
-``` bash
+```bash
 $ composer test
 ```
 
