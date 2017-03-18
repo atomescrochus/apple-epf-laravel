@@ -31,7 +31,35 @@ Then add the ServiceProvider to your `config/app.php` file:
 
 ## Usage
 
+In my opinion, it is easier to keep the EPF database separate from your Laravel app. Now, you'll still need to configure Laravel for that different connection. You can do this by adding an additionnal connection to the relevant array in your `config/database.php` file like so:
+
 ```php
+<?php // File: /config/database.php
+
+'connections' => [
+
+    // [...]
+
+    'apple-epf' => [ // this is your EPF database connection, where you imported EPF
+        'driver'    => 'mysql',
+        'host'      => 'localhost',
+        'database'  => 'apple_epf',
+        'username'  => 'admin',
+        'password'  => 'secret',
+        'charset'   => 'utf8',
+        'collation' => 'utf8mb4_general_ci',
+        'prefix'    => '',
+        'strict'    => false,
+        'engine'    => null,
+    ],
+
+],
+```
+
+**NOTE: this package's models will be looking for the connection with the name "apple-epf", do not change it.**
+
+```php
+// base usage of class.
 $epf = new Atomescrochus\EPF();
 echo $epf->echoPhrase("I'm alive!");
 ```
