@@ -1,17 +1,19 @@
 {
-    "name": "appstract/:package_name",
-    "description": ":package_description",
+    "name": "atomescrochus/apple-epf-laravel",
+    "description": "Provides models and other tools to use Apple's EPF in Laravel.",
     "keywords": [
-        "appstract",
-        ":package_name"
+        "atomescrochus",
+        "apple-epf-laravel",
+        "itunes",
+        "epf"
     ],
-    "homepage": "https://github.com/appstract/:package_name",
+    "homepage": "https://github.com/atomescrochus/apple-epf-laravel",
     "license": "MIT",
     "authors": [
         {
-            "name": ":author_name",
-            "email": "hello@appstract.team",
-            "homepage": "https://appstract.team",
+            "name": "Jean-Philippe Murray",
+            "email": "jp@atomescroch.us",
+            "homepage": "https://atomescroch.us",
             "role": "Developer"
         }
     ],
@@ -23,12 +25,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Appstract\\Skeleton\\": "src"
+            "Atomescrochus\\EPF\\": "src"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Appstract\\Skeleton\\Test\\": "tests"
+            "Atomescrochus\\EPF\\Test\\": "tests"
         }
     },
     "scripts": {

@@ -1,18 +1,18 @@
-# Very short description of the package
+# Integrate Apple's EPF in Laravel
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/appstract/:package_name.svg?style=flat-square)](https://packagist.org/packages/appstract/:package_name)
-[![Total Downloads](https://img.shields.io/packagist/dt/appstract/:package_name.svg?style=flat-square)](https://packagist.org/packages/appstract/:package_name)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/atomescrochus/apple-epf-laravel.svg?style=flat-square)](https://packagist.org/packages/atomescrochus/apple-epf-laravel)
+[![Total Downloads](https://img.shields.io/packagist/dt/atomescrochus/apple-epf-laravel.svg?style=flat-square)](https://packagist.org/packages/atomescrochus/apple-epf-laravel)
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.md)
-[![Build Status](https://img.shields.io/travis/appstract/:package_name/master.svg?style=flat-square)](https://travis-ci.org/appstract/:package_name)
+[![Build Status](https://img.shields.io/travis/atomescrochus/apple-epf-laravel/master.svg?style=flat-square)](https://travis-ci.org/atomescrochus/apple-epf-laravel)
 
-This is where your description should go. Try and limit it to a paragraph or two, and maybe throw in a mention of what PSRs you support to avoid any confusion with users and contributors. Create a link to a medium article.
+This will ultimately provides models and other tools to use Apple's Enterprise Partner Feed (EPF) in Laravel. **This package do not provides EPF data, you still have to bring your own files.** *Work in progress, not usable in production.*
 
 ## Installation
 
 You can install the package via composer:
 
 ```bash
-composer require appstract/:package_name
+composer require atomescrochus/apple-epf-laravel
 ```
 
 ### Provider
@@ -23,7 +23,7 @@ Then add the ServiceProvider to your `config/app.php` file:
 'providers' => [
     ...
 
-    Appstract\Skeleton\SkeletonServiceProvider::class
+    Atomescrochus\EPF\EPFServiceProvider::class
 
     ....
 ]
@@ -32,8 +32,8 @@ Then add the ServiceProvider to your `config/app.php` file:
 ## Usage
 
 ```php
-$skeleton = new Appstract\Skeleton();
-echo $skeleton->echoPhrase('Hello, Appstract!');
+$epf = new Atomescrochus\EPF();
+echo $epf->echoPhrase("I'm alive!");
 ```
 
 ## Testing
@@ -44,15 +44,7 @@ $ composer test
 
 ## Contributing
 
-Contributions are welcome, [thanks to y'all](https://github.com/appstract/:package_name/graphs/contributors) :)
-
-## About Appstract
-
-Appstract is a small team from The Netherlands. <3 Laravel, Vue and other awesome tools.
-
-## Buy Us A Beer
-
-Would be awesome if you would [buy us a beer](https://www.paypal.me/teamappstract/10)! Or [a lot of beer](https://www.patreon.com/appstract) :)
+Contributions are welcome, [thanks to y'all](https://github.com/atomescrochus/apple-epf-laravel/graphs/contributors) :)
 
 ## License
 
