@@ -14,14 +14,19 @@ class Song extends Model
     protected $table = 'song';
     protected $primaryKey = "song_id";
 
-    protected $casts = [
-        //
-    ];
+    // accessors
 
-    public function translations()
+    public function getItunesReleaseDateAttribute($date)
     {
-        return $this->hasMany(SongTranslation::class, 'song_id');
+        return \Carbon\Carbon::parse($date);
     }
+
+    public function getOriginalReleaseDateAttribute($date)
+    {
+        return \Carbon\Carbon::parse($date);
+    }
+
+    // relationships
 
     public function artists()
     {
@@ -36,5 +41,15 @@ class Song extends Model
     public function mixes()
     {
         return $this->belongsToMany(\Atomescrochus\EPF\Models\Mix::class, 'song_mix', 'song_id', 'mix_id');
+    }
+
+    public function parentalAdvisory()
+    {
+        return $this->belongsTo(ParentalAdvisory::class, 'parental_advisory_id');
+    }
+
+    public function translations()
+    {
+        return $this->hasMany(SongTranslation::class, 'song_id');
     }
 }

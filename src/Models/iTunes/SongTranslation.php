@@ -15,9 +15,11 @@ class CollectionTranslation extends Model
     protected $primaryKey = "song_id";
 
     protected $casts = [
-        //
+        'is_pronunciation' => 'boolean',
     ];
 
+    // relationships
+    
     public function song()
     {
         return $this->belongsTo(\Atomescrochus\EPF\Models\Song::class, 'song_id');

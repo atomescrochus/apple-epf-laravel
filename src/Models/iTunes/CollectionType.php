@@ -14,10 +14,8 @@ class CollectionType extends Model
     protected $table = 'collection_type';
     protected $primaryKey = "collection_type_id";
 
-    protected $casts = [
-        //
-    ];
-
+    // relationships
+    
     public function collections()
     {
         return $this->hasMany(Collection::class, 'collection_type_id');

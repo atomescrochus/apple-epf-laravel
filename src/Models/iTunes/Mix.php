@@ -14,13 +14,11 @@ class Mix extends Model
     protected $table = 'mix';
     protected $primaryKey = "mix_id";
 
-    protected $casts = [
-        //
-    ];
+    // relationships
 
     public function collections()
     {
-        return $this->belongsToMany(\Atomescrochus\EPF\Models\Collection::class, 'mix_collection', 'mix_id', 'collection_id');
+        return $this->belongsTo(\Atomescrochus\EPF\Models\MixCollection::class, 'mix_collection_id');
     }
 
     public function songs()

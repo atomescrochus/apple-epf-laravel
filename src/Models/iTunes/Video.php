@@ -2,6 +2,7 @@
 
 namespace Atomescrochus\EPF\Models\iTunes;
 
+use Atomescrochus\EPF\Traits\ExportDate;
 use Illuminate\Database\Eloquent\Model;
 
 class Video extends Model
@@ -9,15 +10,23 @@ class Video extends Model
 
     use ExportDate;
 
-    use Atomescrochus\EPF\Traits\ExportDate;
-
     protected $connection = 'apple-epf';
     protected $table = 'video';
     protected $primaryKey = "video_id";
 
-    protected $casts = [
-        //
-    ];
+    // accessors
+
+    public function getItunesReleaseDateAttribute($date)
+    {
+        return \Carbon\Carbon::parse($date);
+    }
+
+    public function getOriginalReleaseDateAttribute($date)
+    {
+        return \Carbon\Carbon::parse($date);
+    }
+
+    // relationships
 
     public function artists()
     {
@@ -32,5 +41,15 @@ class Video extends Model
     public function genres()
     {
         return $this->belongsToMany(Genre::class, 'genre_video', 'video_id', 'genre_id');
+    }
+
+    public function parentalAdvisory()
+    {
+        return $this->belongsTo(ParentalAdvisory::class, 'parental_advisory_id');
+    }
+
+    public function type()
+    {
+        return $this->belongsTo(\Atomescrochus\EPF\Models\MediaType::class, 'media_type_id', 'media_type_id');
     }
 }

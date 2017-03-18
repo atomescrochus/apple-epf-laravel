@@ -14,9 +14,7 @@ class DeviceType extends Model
     protected $table = 'device_type';
     protected $primaryKey = "device_type_id";
 
-    protected $casts = [
-        //
-    ];
+    // relationships
 
     public function applications()
     {

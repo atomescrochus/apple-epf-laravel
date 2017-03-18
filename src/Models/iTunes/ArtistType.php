@@ -14,9 +14,7 @@ class ArtistType extends Model
     protected $table = 'artist_type';
     protected $primaryKey = "artist_type_id";
 
-    protected $casts = [
-        //
-    ];
+    // relationships
 
     public function artists()
     {

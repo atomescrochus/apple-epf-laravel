@@ -13,9 +13,14 @@ class Application extends Model
     protected $table = 'application';
     protected $primaryKey = "application_id";
 
-    protected $casts = [
-        //
-    ];
+    // accessors
+
+    public function getItunesReleaseDateAttribute($date)
+    {
+        return \Carbon\Carbon::parse($date);
+    }
+
+    // relationships
 
     public function artist()
     {

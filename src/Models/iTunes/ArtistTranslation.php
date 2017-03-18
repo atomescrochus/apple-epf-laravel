@@ -15,11 +15,6 @@ class ArtistTranslation extends Model
     protected $primaryKey = "artist_id";
 
     protected $casts = [
-        //
+        'is_pronunciation' => 'boolean',
     ];
-
-    public function artist()
-    {
-        return $this->belongsTo(\Atomescrochus\EPF\Models\Artist::class, 'artist_id');
-    }
 }

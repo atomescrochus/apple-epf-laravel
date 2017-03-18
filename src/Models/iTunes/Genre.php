@@ -14,10 +14,8 @@ class Genre extends Model
     protected $table = 'genre';
     protected $primaryKey = "genre_id";
 
-    protected $casts = [
-        //
-    ];
-
+    // relationships
+    
     public function applications()
     {
         return $this->belongsToMany(Application::class, 'genre_application', 'genre_id', 'application_id');

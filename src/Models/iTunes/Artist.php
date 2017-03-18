@@ -17,24 +17,16 @@ class Artist extends Model
         'is_actual_artist' => 'boolean',
     ];
 
-    public function type()
-    {
-        return $this->belongsTo(\Atomescrochus\EPF\Models\ArtistType::class, 'artist_type_id', 'artist_type_id');
-    }
+    // relationships
 
     public function applications()
     {
         return $this->belongsToMany(\Atomescrochus\EPF\Models\Application::class, 'artist_application', 'artist_id', 'application_id');
     }
 
-    public function videos()
+    public function collections()
     {
-        return $this->belongsToMany(\Atomescrochus\EPF\Models\Video::class, 'artist_video', 'artist_id', 'video_id');
-    }
-
-    public function songs()
-    {
-        return $this->belongsToMany(\Atomescrochus\EPF\Models\Song::class, 'artist_song', 'artist_id', 'song_id');
+        return $this->belongsToMany(\Atomescrochus\EPF\Models\Collections::class, 'artist_collection', 'collection_id', 'artist_id');
     }
 
     public function translations()
@@ -42,8 +34,18 @@ class Artist extends Model
         return $this->hasMany(ArtistTranslation::class, 'artist_id');
     }
 
-    public function collections()
+    public function type()
     {
-        return $this->belongsToMany(\Atomescrochus\EPF\Models\Collections::class, 'artist_collection', 'collection_id', 'artist_id');
+        return $this->belongsTo(\Atomescrochus\EPF\Models\ArtistType::class, 'artist_type_id');
+    }
+
+    public function songs()
+    {
+        return $this->belongsToMany(\Atomescrochus\EPF\Models\Song::class, 'artist_song', 'artist_id', 'song_id');
+    }
+
+    public function videos()
+    {
+        return $this->belongsToMany(\Atomescrochus\EPF\Models\Video::class, 'artist_video', 'artist_id', 'video_id');
     }
 }
