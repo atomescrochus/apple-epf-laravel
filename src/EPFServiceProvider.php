@@ -1,6 +1,6 @@
 <?php
 
-namespace Appstract\Skeleton;
+namespace Atomescrochus\EPF;
 
 use Illuminate\Support\ServiceProvider;
 
@@ -11,11 +11,7 @@ class EPFServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        if ($this->app->runningInConsole()) {
-            $this->publishes([
-                __DIR__.'/../config/apple-epf.php' => config_path('apple-epf.php'),
-            ], 'config');
-        }
+        //
     }
 
     /**
@@ -23,6 +19,6 @@ class EPFServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->mergeConfigFrom(__DIR__.'/../config/apple-epf.php', 'apple-epf');
+        //
     }
 }
