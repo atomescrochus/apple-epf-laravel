@@ -7,6 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 class Video extends Model
 {
 
+    use ExportDate;
+
+    use Atomescrochus\EPF\Traits\ExportDate;
+
     protected $connection = 'apple-epf';
     protected $table = 'video';
     protected $primaryKey = "video_id";

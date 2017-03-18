@@ -2,10 +2,13 @@
 
 namespace Atomescrochus\EPF\Models\iTunes;
 
+use Atomescrochus\EPF\Traits\ExportDate;
 use Illuminate\Database\Eloquent\Model;
 
 class ArtistType extends Model
 {
+
+    use ExportDate;
 
     protected $connection = 'apple-epf';
     protected $table = 'artist_type';
