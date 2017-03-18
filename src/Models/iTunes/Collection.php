@@ -30,6 +30,11 @@ class Collection extends Model
         return $this->belongsToMany(\Atomescrochus\EPF\Models\Song::class, 'collection_song', 'collection_id', 'song_id');
     }
 
+    public function mixes()
+    {
+        return $this->belongsToMany(\Atomescrochus\EPF\Models\Mix::class, 'mix_collection', 'collection_id', 'mix_id');
+    }
+
     public function videos()
     {
         return $this->belongsToMany(\Atomescrochus\EPF\Models\Video::class, 'collection_video', 'collection_id', 'video_id');
