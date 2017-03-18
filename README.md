@@ -64,6 +64,10 @@ $epf = new Atomescrochus\EPF();
 echo $epf->echoPhrase("I'm alive!");
 ```
 
+## Notes
+
+There is curently no models for the table `video_translation`: I could not successfully import it locally (yet), so there is no way for me to work with it, hence try to make a model for it. If anyone can help with that, a PR would be very welcomed!
+
 ## Testing
 
 ```bash
