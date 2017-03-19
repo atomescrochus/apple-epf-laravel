@@ -148,7 +148,7 @@ class FullEPFImport extends Command
                         
                     $this->bytesInPreviousIteration = 0; //
                     $this->downloadProgressBar = new ProgressBar($this->output, $downloadTotal);
-                    $this->downloadProgressBar->setFormat('debug');
+                    $this->downloadProgressBar->setFormat('very_verbose');
                 } else if ($this->downloadProgressBar != null && $downloadTotal == $downloadedBytes) {
                     // there is a progress bar and the download it finished
                         
