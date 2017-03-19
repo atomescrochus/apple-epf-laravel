@@ -107,6 +107,11 @@ class EPFImporter extends Command
         
         $this->downloadFiles("incremental", true);
 
+        // next things:
+        // uncompress files
+        // import files
+        // delete files
+
         $processEnded = Carbon::now();
 
         $this->line("Test import process completed! 🎉");
@@ -138,11 +143,7 @@ class EPFImporter extends Command
             $this->info("The latest full import you made is up to date, we won't be downloading the files again.");
         }
 
-        // next things:
-        // compare md5
-        // uncompress files
-        // import files
-        // delete files
+        // insert next things here after testing123 is done.
 
         // $this->infos->lastFullImportComplete = true; // should set true when EVERYTHING was finished correctly
         $this->writeInfoFile();
@@ -178,11 +179,7 @@ class EPFImporter extends Command
             $this->info("The latest incremental import you made is up to date, we won't be downloading the files again.");
         }
 
-        // next things:
-        // compare md5
-        // uncompress files
-        // import files
-        // delete files
+        // insert next things here after testing123 is done.
 
         // $this->infos->lastFullImportComplete = true; // should set true when EVERYTHING was finished correctly
         $this->writeInfoFile();
