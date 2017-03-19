@@ -69,10 +69,6 @@ class EPFImporter extends Command
             throw MissingCommandOptions::type();
         }
 
-        if ($this->option('type') == "incremental") {
-            throw NotSupported::incrementalImport();
-        }
-
         $this->line("");
         $this->line("👋. Welcome to the Apple EPF importer! 👋");
         $this->info("The process of downloading and importing the files takes a lot of resources.");
@@ -86,6 +82,10 @@ class EPFImporter extends Command
 
             if ($this->option('type') == "full") {
                 $this->startFullImportProcess();
+            }
+
+            if ($this->option('type') == "incremental") {
+                $this->startIncrementalImportProcess();
             }
 
             $this->writeInfoFile();
@@ -125,6 +125,44 @@ class EPFImporter extends Command
         $processEnded = Carbon::now();
 
         $this->line("Full import process completed! 🎉");
+        $this->info("Process started on: {$processStarted->toDatetimeString()}.");
+        $this->info("Process ended on: {$processEnded->toDatetimeString()}.");
+        $this->line("Duration in minutes: {$processStarted->diffInMinutes($processEnded)}.");
+        $this->line("Duration in hours: {$processStarted->diffInHours($processEnded)}.");
+        $this->line("");
+    }
+
+    private function startIncrementalImportProcess()
+    {
+        $this->line("We're starting the process for an incremental import. Have you for your ☕ yet?");
+
+        $processStarted = Carbon::now();
+        $epfDate = $this->epf->incrementalImportTime;
+        $shouldImport = is_null($this->infos->lastIncrementalImportDate) ? true : $this->infos->lastIncrementalImportDate->lte($epfDate);
+
+        if ($shouldImport && $this->infos->lastIncrementalImportComplete == false) {
+            $this->info("Either your latest incremental import is not up to date, or the latest seems to not have been completed successfully. In any case, we have to download the files [again].");
+
+            $this->infos->lastIncrementalImportDate = $epfDate;
+            $this->infos->lastIncrementalImportComplete = false;
+            $this->writeInfoFile();
+            
+            $this->downloadFiles("incremental");
+        } else {
+            $this->info("The latest incremental import you made is up to date, we won't be downloading the files again.");
+        }
+
+        // next things:
+        // compare md5
+        // uncompress files
+        // import files
+        // delete files
+
+        // $this->infos->lastFullImportComplete = true; // should set true when EVERYTHING was finished correctly
+        $this->writeInfoFile();
+        $processEnded = Carbon::now();
+
+        $this->line("Incremental import process completed! 🎉");
         $this->info("Process started on: {$processStarted->toDatetimeString()}.");
         $this->info("Process ended on: {$processEnded->toDatetimeString()}.");
         $this->line("Duration in minutes: {$processStarted->diffInMinutes($processEnded)}.");
@@ -209,7 +247,7 @@ class EPFImporter extends Command
             $content = (object) [
                 'lastFullImportDate' => Carbon::now()->subDays(10), // anything in the past
                 'lastIncrementalImportDate' => Carbon::now()->subDays(10), // anything in the past
-                'lastIncrementalmportComplete' => false,
+                'lastIncrementalImportComplete' => false,
                 'lastFullImportComplete' => false,
             ];
 
