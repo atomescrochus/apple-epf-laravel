@@ -118,7 +118,7 @@ class FullEPFImport extends Command
         $links = $this->epf->links->get($group);
         $countLinks = count($links);
 
-        $this->line("There is a total of {$countLinks} to download.");
+        $this->line("There is a total of {$countLinks} files to download.");
 
         $links->each(function ($link) use ($group) {
             $this->line("");
