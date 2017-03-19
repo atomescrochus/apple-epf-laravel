@@ -35,7 +35,7 @@ class FullEPFImport extends Command
     private $infos;
     private $infoFileLocation;
     private $fileDownloadLocation;
-    private $progressBar;
+    private $downloadProgressBar;
 
     /**
      * Create a new command instance.
@@ -51,12 +51,9 @@ class FullEPFImport extends Command
             'password' => config('apple-epf.password'),
         ];
 
-        $this->progressBar = null;
+        $this->downloadProgressBar = null;
         $this->infoFileLocation = "epf-imports/epfImportInfos.json";
-        $this->fullImportfileDownloadLocationForFilesystem = "epf-imports/full/";
-        $this->fullImportfileDownloadLocation = storage_path()."/app/epf-imports/full/";
-        $this->incrementalImportfileDownloadLocation = storage_path()."/app/epf-imports/incremental/";
-        $this->incrementalImportfileDownloadLocationForFilesystem = "epf-imports/incremental/";
+        $this->fullPathToEpfImport = storage_path()."/app/epf-imports/";
         $this->initInfoFile();
     }
 
@@ -94,7 +91,7 @@ class FullEPFImport extends Command
             $this->infos->lastFullImportComplete = false;
 
             $this->writeInfoFile();
-            $this->downloadFullFiles();
+            $this->downloadFiles("full");
         } else {
             $this->comment("The latests full import you made is up to date, we won't download the files again.");
         }
@@ -105,41 +102,55 @@ class FullEPFImport extends Command
         $this->info("Full import process completed! 🎉");
     }
 
-    private function downloadFullFiles()
+    private function downloadFiles($whichGroup)
     {
+        $this->line("");
         $this->info("We've started to download the files. This can take a long time, as some files are huge (we're talking gigabytes huge) !");
 
-        $links = $this->epf->links->get('full');
+        $links = $this->epf->links->get($whichGroup);
+        $countLinks = count($links);
 
-        $links->each(function ($link) {
+        $this->line("There is a total of {$countLinks} to download.");
+
+        $links->each(function ($link) use ($whichGroup) {
             $this->line("");
             $this->info("Starting download of {$link}");
             
             $file = basename($link);
-            $fileLocation = $this->fullImportfileDownloadLocation.$file;
+            $fileLocation = "{$this->fullPathToEpfImport}{$whichGroup}/{$file}";
 
-            $client = new Client();
-            $client->request('GET', $link, [
-                'auth' => [$this->credentials->login, $this->credentials->password],
-                'sink' => $fileLocation,
-                'progress' => function ($downloadTotal, $downloadedBytes, $uploadTotal, $uploadedBytes) {
-                    // $this->line("total: {$downloadTotal}");
-                    // $this->line("downloaded: {$downloadedBytes}");
-                    if ($this->progressBar == null && $downloadTotal != 0) {
-                        $this->downloadedBefore = 0;
-                        $this->progressBar = new ProgressBar($this->output, $downloadTotal);
-                        $this->progressBar->setFormat('debug');
-                    } else if ($this->progressBar != null && $downloadTotal == $downloadedBytes) {
-                        $this->progressBar->finish();
-                    } else if ($this->progressBar != null) {
-                        $this->progressBar->advance($downloadedBytes - $this->downloadedBefore);
-                        $this->downloadedBefore = $downloadedBytes;
-                    }
-                },
-            ]);
-            $this->progressBar = null;
+            $this->executeDownload($link, $fileLocation);
+
             $this->line("");
         });
+    }
+
+    private function executeDownload($link, $saveTo)
+    {
+        $client = new Client();
+        $client->request('GET', $link, [
+            'auth' => [$this->credentials->login, $this->credentials->password],
+            'sink' => $saveTo,
+            'progress' => function ($downloadTotal, $downloadedBytes, $uploadTotal, $uploadedBytes) {
+                if ($this->downloadProgressBar == null && $downloadTotal != 0) {
+                    // no progress bar and download started
+                        
+                    $this->bytesInPreviousIteration = 0; //
+                    $this->downloadProgressBar = new ProgressBar($this->output, $downloadTotal);
+                    $this->downloadProgressBar->setFormat('debug');
+                } else if ($this->downloadProgressBar != null && $downloadTotal == $downloadedBytes) {
+                    // there is a progress bar and the download it finished
+                        
+                    $this->downloadProgressBar->finish();
+                    $this->downloadProgressBar = null;
+                } else if ($this->downloadProgressBar != null) {
+                    // at this point, we're downloading and got a progress bar
+
+                    $this->downloadProgressBar->advance($downloadedBytes - $this->bytesInPreviousIteration);
+                    $this->bytesInPreviousIteration = $downloadedBytes;
+                }
+            },
+        ]);
     }
 
     private function writeInfoFile($where = null)
