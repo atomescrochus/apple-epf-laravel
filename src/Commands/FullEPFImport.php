@@ -6,7 +6,6 @@ use Atomescrochus\EPF\EPFCrawler;
 use Atomescrochus\EPF\Exceptions\MissingCommandOptions;
 use Atomescrochus\EPF\Exceptions\NotSupported;
 use Carbon\Carbon;
-use GuzzleHttp\Client;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\Console\Helper\ProgressBar;
@@ -134,7 +133,7 @@ class FullEPFImport extends Command
 
     private function executeDownload($link, $saveTo)
     {
-        $client = new Client();
+        $client = new \GuzzleHttp\Client();
         $client->request('GET', $link, [
             'auth' => [$this->credentials->login, $this->credentials->password],
             'sink' => $saveTo,
