@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Storage;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Process\Process;
 
-class FullEPFImport extends Command
+class EPFImporter extends Command
 {
 
     /**
@@ -65,44 +65,66 @@ class FullEPFImport extends Command
      */
     public function handle()
     {
-        $this->line("");
-        $this->comment("This might take a while, some of the files are huge.");
-        $this->checkForType();
-        
-        $this->epf = new EPFCrawler($this->credentials);
-
-        if ($this->type == "full") {
-            $this->startFullImportProcess();
+        if (is_null($this->option('type'))) {
+            throw MissingCommandOptions::type();
         }
 
-        $this->writeInfoFile();
-        $this->comment("We're done! Congratulations!");
+        if ($this->option('type') == "incremental") {
+            throw NotSupported::incrementalImport();
+        }
+
+        $this->line("");
+        $this->line("👋. Welcome to the Apple EPF importer! 👋");
+        $this->info("The process of downloading and importing the files takes a lot of resources.");
+        $this->info("The compressed files for a full import are over 30gb, and you still need space to uncompress them, and then import them to your database!");
+        $this->comment("For your own sake, please make sure this is installed on a machine with enough resources!");
+
+        if ($this->confirm("Other than that, you'll need patience and time. Do you want to continue?")) {
+            $this->line("Allright then, grab a ☕, it's going to be a long ride!");
+
+            $this->epf = new EPFCrawler($this->credentials);
+
+            if ($this->option('type') == "full") {
+                $this->startFullImportProcess();
+            }
+
+            $this->writeInfoFile();
+
+            $this->comment("We're done! Congratulations!");
+        }
     }
 
     private function startFullImportProcess()
     {
+        $this->line("We're starting the process for a full import. Have you for your ☕ yet?");
+
         $processStarted = Carbon::now();
-        $this->info("We've started the full import process, you can go take a ☕️!");
         $epfDate = $this->epf->fullImportTime;
         $shouldImport = is_null($this->infos->lastFullImportDate) ? true : $this->infos->lastFullImportDate->lte($epfDate);
 
         if ($shouldImport && $this->infos->lastFullImportComplete == false) {
-            $this->comment("Either your latest full import is not up to date, or the latests seems to not have completed successfully. In any case, we'll be starting the process again, and resuming incomplete files.");
+            $this->info("Either your latest full import is not up to date, or the latest seems to not have been completed successfully. In any case, we have to download the files [again].");
 
             $this->infos->lastFullImportDate = $epfDate;
             $this->infos->lastFullImportComplete = false;
-
             $this->writeInfoFile();
+            
             $this->downloadFiles("full");
         } else {
-            $this->comment("The latests full import you made is up to date, we won't download the files again.");
+            $this->info("The latest full import you made is up to date, we won't be downloading the files again.");
         }
 
-        // $this->infos->lastFullImportComplete = true; should set true when also imported to database
-        
+        // next things:
+        // compare md5
+        // uncompress files
+        // import files
+        // delete files
+
+        // $this->infos->lastFullImportComplete = true; // should set true when EVERYTHING was finished correctly
         $this->writeInfoFile();
         $processEnded = Carbon::now();
-        $this->info("Full import process completed! 🎉");
+
+        $this->line("Full import process completed! 🎉");
         $this->info("Process started on: {$processStarted->toDatetimeString()}.");
         $this->info("Process ended on: {$processEnded->toDatetimeString()}.");
         $this->line("Duration in minutes: {$processStarted->diffInMinutes($processEnded)}.");
@@ -113,20 +135,22 @@ class FullEPFImport extends Command
     private function downloadFiles($group)
     {
         $this->line("");
-        $this->info("We've started to download the files. This can take a long time, as some files are huge (we're talking gigabytes huge) !");
+        $this->line("We're starting to download the '{$group}' group of files. Depending on your connection, this might take a long time!");
 
         $links = $this->epf->links->get($group);
         $countLinks = count($links);
 
-        $this->line("There is a total of {$countLinks} files to download.");
+        $this->info("There is a total of {$countLinks} files to download.");
 
         $links->each(function ($link) use ($group) {
             $this->line("");
-            $this->info("Starting download of {$link}");
+            $this->line("Starting download of {$link}");
+            $this->line("");
 
             $this->executeDownload($link, $group);
 
-            $this->info("Finished download of {$link}");
+            $this->line("");
+            $this->line("Finished download of {$link}");
             $this->line("");
         });
     }
@@ -191,18 +215,5 @@ class FullEPFImport extends Command
 
             $this->infos = $content;
         }
-    }
-
-    private function checkForType()
-    {
-        if (is_null($this->option('type'))) {
-            throw MissingCommandOptions::type();
-        }
-
-        if ($this->option('type') == "incremental") {
-            throw NotSupported::incrementalImport();
-        }
-
-        $this->type = $this->option('type');
     }
 }

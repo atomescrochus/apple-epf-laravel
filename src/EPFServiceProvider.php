@@ -17,7 +17,7 @@ class EPFServiceProvider extends ServiceProvider
             ], 'config');
 
             $this->commands([
-                Commands\FullEPFImport::class,
+                Commands\EPFImporter::class,
             ]);
         }
     }
