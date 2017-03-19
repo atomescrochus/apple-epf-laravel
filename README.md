@@ -9,6 +9,8 @@ This will ultimately provides models and other tools to use Apple's Enterprise P
 
 ## Installation
 
+Important: The packages requires `wget` to be installed on your system, as it uses it to fetch the EPF files.
+
 You can install the package via composer:
 
 ```bash
