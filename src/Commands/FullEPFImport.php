@@ -103,8 +103,8 @@ class FullEPFImport extends Command
         $this->writeInfoFile();
         $processEnded = Carbon::now();
         $this->info("Full import process completed! 🎉");
-        $this->info("Process started on: {$processStarted->toDateimeString()}.");
-        $this->info("Process ended on: {$processEnded->toDateimeString()}.");
+        $this->info("Process started on: {$processStarted->toDatetimeString()}.");
+        $this->info("Process ended on: {$processEnded->toDatetimeString()}.");
         $this->line("Duration in minutes: {$processStarted->diffInMinutes($processEnded)}.");
         $this->line("Duration in hours: {$processStarted->diffInHours($processEnded)}.");
         $this->line("");
