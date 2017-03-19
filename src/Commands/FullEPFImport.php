@@ -126,6 +126,7 @@ class FullEPFImport extends Command
 
             $this->executeDownload($link, $group);
 
+            $this->info("Finished download of {$link}");
             $this->line("");
         });
     }
