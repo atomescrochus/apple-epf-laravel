@@ -54,6 +54,7 @@ class FullEPFImport extends Command
         $this->downloadProgressBar = null;
         $this->infoFileLocation = "epf-imports/epfImportInfos.json";
         $this->fullPathToEpfImport = storage_path()."/app/epf-imports/";
+        $this->storagePathToEpfImport = "/epf-imports/";
         $this->initInfoFile();
     }
 
@@ -109,35 +110,38 @@ class FullEPFImport extends Command
         $this->line("");
     }
 
-    private function downloadFiles($whichGroup)
+    private function downloadFiles($group)
     {
         $this->line("");
         $this->info("We've started to download the files. This can take a long time, as some files are huge (we're talking gigabytes huge) !");
 
-        $links = $this->epf->links->get($whichGroup);
+        $links = $this->epf->links->get($group);
         $countLinks = count($links);
 
         $this->line("There is a total of {$countLinks} to download.");
 
-        $links->each(function ($link) use ($whichGroup) {
+        $links->each(function ($link) use ($group) {
             $this->line("");
             $this->info("Starting download of {$link}");
-            
-            $file = basename($link);
-            $fileLocation = "{$this->fullPathToEpfImport}{$whichGroup}/{$file}";
 
-            $this->executeDownload($link, $fileLocation);
+            $this->executeDownload($link, $group);
 
             $this->line("");
         });
     }
 
-    private function executeDownload($link, $saveTo)
+    private function executeDownload($link, $group)
     {
+        $filename = $file = basename($link);
+        $pathForStorage = "{$this->storagePathToEpfImport}/{$group}/{$filename}";
+        $pathToSaveTo = "{$this->fullPathToEpfImport}{$group}/{$file}";
+        
+        Storage::put($pathForStorage, "");
+
         $client = new Client();
         $client->request('GET', $link, [
             'auth' => [$this->credentials->login, $this->credentials->password],
-            'sink' => $saveTo,
+            'sink' => $pathToSaveTo,
             'progress' => function ($downloadTotal, $downloadedBytes, $uploadTotal, $uploadedBytes) {
                 if ($this->downloadProgressBar == null && $downloadTotal != 0) {
                     // no progress bar and download started
