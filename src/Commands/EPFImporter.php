@@ -88,14 +88,38 @@ class EPFImporter extends Command
                 $this->startIncrementalImportProcess();
             }
 
+            if ($this->option('type') == "testing123") {
+                $this->testProcess();
+            }
+
             $this->writeInfoFile();
 
             $this->comment("We're done! Congratulations!");
         }
     }
 
+    public function testProcess()
+    {
+        $this->line('');
+        $this->line("🤖  Hello admin. We'll be starting a test with a limited set of files. You can always tweak stuff in the code, this is not intended for production use.");
+
+        $processStarted = Carbon::now();
+        
+        $this->downloadFiles("incremental", true);
+
+        $processEnded = Carbon::now();
+
+        $this->line("Test import process completed! 🎉");
+        $this->info("Process started on: {$processStarted->toDatetimeString()}.");
+        $this->info("Process ended on: {$processEnded->toDatetimeString()}.");
+        $this->line("Duration in minutes: {$processStarted->diffInMinutes($processEnded)}.");
+        $this->line("Duration in hours: {$processStarted->diffInHours($processEnded)}.");
+        $this->line("");
+    }
+
     private function startFullImportProcess()
     {
+        $this->line('');
         $this->line("We're starting the process for a full import. Have you for your ☕ yet?");
 
         $processStarted = Carbon::now();
@@ -124,6 +148,7 @@ class EPFImporter extends Command
         $this->writeInfoFile();
         $processEnded = Carbon::now();
 
+        $this->line('');
         $this->line("Full import process completed! 🎉");
         $this->info("Process started on: {$processStarted->toDatetimeString()}.");
         $this->info("Process ended on: {$processEnded->toDatetimeString()}.");
@@ -134,6 +159,7 @@ class EPFImporter extends Command
 
     private function startIncrementalImportProcess()
     {
+        $this->line('');
         $this->line("We're starting the process for an incremental import. Have you for your ☕ yet?");
 
         $processStarted = Carbon::now();
@@ -162,6 +188,7 @@ class EPFImporter extends Command
         $this->writeInfoFile();
         $processEnded = Carbon::now();
 
+        $this->line('');
         $this->line("Incremental import process completed! 🎉");
         $this->info("Process started on: {$processStarted->toDatetimeString()}.");
         $this->info("Process ended on: {$processEnded->toDatetimeString()}.");
@@ -170,12 +197,20 @@ class EPFImporter extends Command
         $this->line("");
     }
 
-    private function downloadFiles($group)
+    private function downloadFiles($group, $debug = false)
     {
         $this->line("");
         $this->line("We're starting to download the '{$group}' group of files. Depending on your connection, this might take a long time!");
 
         $links = $this->epf->links->get($group);
+
+        if ($debug) {
+            $this->comment("⚠️  We're only getting the 'match' files, because this is a test! ⚠️ ");
+            $links = $links->filter(function ($link) {
+                return str_contains($link, 'match');
+            });
+        }
+
         $countLinks = count($links);
 
         $this->info("There is a total of {$countLinks} files to download.");
@@ -191,6 +226,43 @@ class EPFImporter extends Command
             $this->line("Finished download of {$link}");
             $this->line("");
         });
+
+
+        $this->line("Starting md5 checksum of downloaded files. 🏁");
+        $this->line('');
+
+        $md5ChecksFailed = $links->reject(function ($link) {
+            return str_contains($link, ".md5");
+        })->map(function ($link) {
+            return basename($link);
+        })->flatten()->mapWithKeys(function ($filename) use ($group) {
+            $check = $this->verifyFileHash($filename, $group);
+            return [$filename => $check];
+        })->contains(false);
+
+        if ($md5ChecksFailed) {
+            if ($this->confirm("Some of the MD5 checks failed. Some files might be corrupted. You could continue (no) or abort and start over (yes). Do you want to abort?")) {
+                die("Aborted. Catch you on the flip side.");
+            }
+        }
+    }
+
+    private function verifyFileHash($filename, $group)
+    {
+
+        $pathToFile = "{$this->storagePathToEpfImport}{$group}/{$filename}";
+        $pathToMd5File = $pathToFile.".md5";
+        $fileToCheck = "{$this->fullPathToEpfImport}{$group}/{$filename}";
+        $fileToCheck = md5_file($fileToCheck);
+        $md5StringAgainst = trim(substr(Storage::get($pathToMd5File), -33));
+        
+        if ($fileToCheck == $md5StringAgainst) {
+            $this->line("{$filename} checksum: ✅ passed!");
+            return true;
+        } else {
+            $this->line("{$filename} checksum: ❌ failed!");
+            return false;
+        }
     }
 
     private function executeDownload($link, $group)
