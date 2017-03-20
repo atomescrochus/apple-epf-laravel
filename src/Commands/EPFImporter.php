@@ -4,6 +4,7 @@ namespace Atomescrochus\EPF\Commands;
 
 use Alchemy\Zippy\Zippy;
 use Atomescrochus\EPF\EPFCrawler;
+use Atomescrochus\EPF\EPFFileImporter;
 use Atomescrochus\EPF\Exceptions\MissingCommandOptions;
 use Atomescrochus\EPF\Exceptions\NotSupported;
 use Carbon\Carbon;
@@ -107,8 +108,9 @@ class EPFImporter extends Command
 
         $processStarted = Carbon::now();
         
-        $this->downloadFiles("incremental", true);
-        $this->extractFiles("incremental");
+        // $this->downloadFiles("incremental", true);
+        // $this->extractFiles("incremental");
+        $this->importFiles("incremental");
 
         // next things:
         // uncompress files
@@ -123,6 +125,35 @@ class EPFImporter extends Command
         $this->line("Duration in minutes: {$processStarted->diffInMinutes($processEnded)}.");
         $this->line("Duration in hours: {$processStarted->diffInHours($processEnded)}.");
         $this->line("");
+    }
+
+    private function importFiles($group)
+    {
+
+        // $folders = $this->downloadedFiles->reject(function ($filename) {
+        //     return str_contains($filename, ".md5");
+        // })->map(function ($path) {
+        //     $path = pathinfo($path);
+        //     return $path['filename'];
+        // });
+
+        // $filesToImport = $folders->map(function ($folder) use ($group) {
+        //     $files = Storage::files("{$this->storagePathToEpfImport}/{$group}/{$folder}");
+        //     $pathToFile = "{$this->fullPathToEpfImport}{$group}/{$folder}/";
+
+        //     return collect($files)->map(function ($file) use ($pathToFile) {
+        //         $filename = basename($file);
+        //         return "{$pathToFile}{$filename}";
+        //     });
+        // });
+        //
+        //uncomment above, and remove under after tests are done
+        $filesToImport = collect(['/Users/jpmurray/Repositories/workbench/storage/app/epf-imports//incremental/match20170320/artist_match']);
+
+        $filesToImport->each(function ($file) {
+            $epfImport = new EPFFileImporter($file);
+            dd($epfImport);
+        });
     }
 
     private function extractFiles($group)
