@@ -134,14 +134,12 @@ class EPFImporter extends Command
 
         $zippy = Zippy::load();
 
-        $toExtract->each(function ($file) use ($zippy) {
+        $toExtract->each(function ($file) use ($zippy, $extractTo) {
             $this->line("Extracting {$file}");
-            $archive = $zippy->open($file);
+            $archive = $zippy->open($file, '.tar.bz2');
             $archive->extract($extractTo);
-            $this->line("Done extracting");
+            $this->info("Extraction of {$file} completed.");
         });
-
-        dd("yolo");
     }
 
     private function downloadFiles($group, $debug = false)
