@@ -3,11 +3,14 @@
 namespace Atomescrochus\EPF;
 
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 
 class EPFFileImporter
 {
     protected $file;
+    protected $connection;
     protected $specialChars;
     protected $exportType;
     protected $columns;
@@ -21,9 +24,29 @@ class EPFFileImporter
             'co' => "#", // comments delimiter,
             'le' => "##legal", // legal comments delimiter
         ];
+        $this->connection = 'apple-epf';
 
         $this->file = new \SplFileObject($file);
         $this->getRelevantInformationFromFile();
+        $this->checkForTable();
+    }
+
+    public function checkForTable()
+    {
+        $tableName = $this->file->getFilename();
+        $tableExists = Schema::connection($this->connection)->hasTable($tableName);
+
+        if (!$tableExists) {
+            $columns = collect();
+            $this->columns->each(function ($type, $name) use ($columns) {
+                $columns->push("{$name} {$type}");
+            });
+
+            $columns = implode(", ", $columns->toArray());
+            $sql = "CREATE TABLE {$tableName} ({$columns}, PRIMARY KEY ($this->primaryKey));";
+
+            DB::connection($this->connection)->statement($sql);
+        }
     }
 
     private function getRelevantInformationFromFile()
