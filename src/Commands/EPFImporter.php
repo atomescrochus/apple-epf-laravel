@@ -4,6 +4,7 @@ namespace Atomescrochus\EPF\Commands;
 
 use Alchemy\Zippy\Zippy;
 use Atomescrochus\EPF\EPFCrawler;
+use Atomescrochus\EPF\EPFFileImporter;
 use Atomescrochus\EPF\Exceptions\MissingCommandOptions;
 use Atomescrochus\EPF\Exceptions\NotSupported;
 use Carbon\Carbon;
@@ -109,11 +110,12 @@ class EPFImporter extends Command
         
         $this->downloadFiles("incremental", true);
         $this->extractFiles("incremental");
+        $this->importFiles("incremental");
 
         // next things:
-        // uncompress files
-        // import files
         // delete files
+        // check all workflows
+        // test on a vps
 
         $processEnded = Carbon::now();
 
@@ -123,6 +125,38 @@ class EPFImporter extends Command
         $this->line("Duration in minutes: {$processStarted->diffInMinutes($processEnded)}.");
         $this->line("Duration in hours: {$processStarted->diffInHours($processEnded)}.");
         $this->line("");
+    }
+
+    private function importFiles($group)
+    {
+        $this->line("");
+        $this->line("We'll start to ingest the files to the database. Hang on!");
+
+        $folders = $this->downloadedFiles->reject(function ($filename) {
+            return str_contains($filename, ".md5");
+        })->map(function ($path) {
+            $path = pathinfo($path);
+            return $path['filename'];
+        });
+
+        $filesToImport = $folders->flatMap(function ($folder) use ($group) {
+            $files = Storage::files("{$this->storagePathToEpfImport}/{$group}/{$folder}");
+            $pathToFile = "{$this->fullPathToEpfImport}{$group}/{$folder}/";
+
+            return collect($files)->map(function ($file) use ($pathToFile) {
+                $filename = basename($file);
+                return "{$pathToFile}{$filename}";
+            });
+        });
+
+        $filesToImport->each(function ($file) {
+            $epfImport = new EPFFileImporter($file);
+            $this->line("Starting to import {$file}!");
+            $epfImport->startImport();
+            $this->comment("Finished last file. I've imported {$epfImport->totalRows} rows in {$epfImport->duration} seconds ⏱");
+        });
+
+        $this->line("All files have been ingested! 🎉");
     }
 
     private function extractFiles($group)
