@@ -16,6 +16,7 @@ class EPFFileImporter
     protected $columns;
     protected $primaryKeys;
     public $duration;
+    public $totalRows;
 
     public function __construct($file)
     {
@@ -26,6 +27,7 @@ class EPFFileImporter
             'le' => "##legal", // legal comments delimiter
         ];
         $this->connection = 'apple-epf';
+        $this->totalRows = 0;
 
         $this->file = new \SplFileObject($file);
         $this->getRelevantInformationFromFile();
@@ -36,7 +38,7 @@ class EPFFileImporter
     {
         $start = Carbon::now();
         // fetch the model based on the file name
-        $model = "Atomescrochus\EPF\Models\Pivots\\";
+        $model = "Atomescrochus\EPF\Models\iTunes\\";
         $model .= studly_case($this->file->getFilename());
 
         $this->file->seek(0);
@@ -58,6 +60,7 @@ class EPFFileImporter
                 });
 
                 $row = $model::updateOrCreate($data->toArray());
+                $this->totalRows++;
             }
         }
 

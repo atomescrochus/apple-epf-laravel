@@ -113,9 +113,9 @@ class EPFImporter extends Command
         $this->importFiles("incremental");
 
         // next things:
-        // uncompress files
-        // import files
         // delete files
+        // check all workflows
+        // test on a vps
 
         $processEnded = Carbon::now();
 
@@ -148,15 +148,12 @@ class EPFImporter extends Command
                 return "{$pathToFile}{$filename}";
             });
         });
-        
-        //uncomment above, and remove under after tests are done
-        // $filesToImport = collect(['/Users/jpmurray/Repositories/workbench/storage/app/epf-imports//incremental/match20170320/artist_match']);
 
         $filesToImport->each(function ($file) {
             $epfImport = new EPFFileImporter($file);
             $this->line("Starting to import {$file}!");
             $epfImport->startImport();
-            $this->comment("Finished importing last file in {$epfImport->duration} seconds.");
+            $this->comment("Finished last file. I've imported {$epfImport->totalRows} rows in {$epfImport->duration} seconds ⏱");
         });
 
         $this->line("All files have been ingested! 🎉");
