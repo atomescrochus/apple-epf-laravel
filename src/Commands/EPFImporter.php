@@ -2,6 +2,7 @@
 
 namespace Atomescrochus\EPF\Commands;
 
+use Alchemy\Zippy\Zippy;
 use Atomescrochus\EPF\EPFCrawler;
 use Atomescrochus\EPF\Exceptions\MissingCommandOptions;
 use Atomescrochus\EPF\Exceptions\NotSupported;
@@ -36,6 +37,7 @@ class EPFImporter extends Command
     private $infoFileLocation;
     private $fileDownloadLocation;
     private $downloadProgressBar;
+    private $downloadedFiles;
 
     /**
      * Create a new command instance.
@@ -106,6 +108,7 @@ class EPFImporter extends Command
         $processStarted = Carbon::now();
         
         $this->downloadFiles("incremental", true);
+        $this->extractFiles("incremental");
 
         // next things:
         // uncompress files
@@ -122,76 +125,23 @@ class EPFImporter extends Command
         $this->line("");
     }
 
-    private function startFullImportProcess()
+    private function extractFiles($group)
     {
-        $this->line('');
-        $this->line("We're starting the process for a full import. Have you for your ☕ yet?");
+        $toExtract = $this->downloadedFiles->reject(function ($filename) {
+            return str_contains($filename, ".md5");
+        });
+        $extractTo = "{$this->fullPathToEpfImport}{$group}";
 
-        $processStarted = Carbon::now();
-        $epfDate = $this->epf->fullImportTime;
-        $shouldImport = is_null($this->infos->lastFullImportDate) ? true : $this->infos->lastFullImportDate->lte($epfDate);
+        $zippy = Zippy::load();
 
-        if ($shouldImport && $this->infos->lastFullImportComplete == false) {
-            $this->info("Either your latest full import is not up to date, or the latest seems to not have been completed successfully. In any case, we have to download the files [again].");
+        $toExtract->each(function ($file) use ($zippy) {
+            $this->line("Extracting {$file}");
+            $archive = $zippy->open($file);
+            $archive->extract($extractTo);
+            $this->line("Done extracting");
+        });
 
-            $this->infos->lastFullImportDate = $epfDate;
-            $this->infos->lastFullImportComplete = false;
-            $this->writeInfoFile();
-            
-            $this->downloadFiles("full");
-        } else {
-            $this->info("The latest full import you made is up to date, we won't be downloading the files again.");
-        }
-
-        // insert next things here after testing123 is done.
-
-        // $this->infos->lastFullImportComplete = true; // should set true when EVERYTHING was finished correctly
-        $this->writeInfoFile();
-        $processEnded = Carbon::now();
-
-        $this->line('');
-        $this->line("Full import process completed! 🎉");
-        $this->info("Process started on: {$processStarted->toDatetimeString()}.");
-        $this->info("Process ended on: {$processEnded->toDatetimeString()}.");
-        $this->line("Duration in minutes: {$processStarted->diffInMinutes($processEnded)}.");
-        $this->line("Duration in hours: {$processStarted->diffInHours($processEnded)}.");
-        $this->line("");
-    }
-
-    private function startIncrementalImportProcess()
-    {
-        $this->line('');
-        $this->line("We're starting the process for an incremental import. Have you for your ☕ yet?");
-
-        $processStarted = Carbon::now();
-        $epfDate = $this->epf->incrementalImportTime;
-        $shouldImport = is_null($this->infos->lastIncrementalImportDate) ? true : $this->infos->lastIncrementalImportDate->lte($epfDate);
-
-        if ($shouldImport && $this->infos->lastIncrementalImportComplete == false) {
-            $this->info("Either your latest incremental import is not up to date, or the latest seems to not have been completed successfully. In any case, we have to download the files [again].");
-
-            $this->infos->lastIncrementalImportDate = $epfDate;
-            $this->infos->lastIncrementalImportComplete = false;
-            $this->writeInfoFile();
-            
-            $this->downloadFiles("incremental");
-        } else {
-            $this->info("The latest incremental import you made is up to date, we won't be downloading the files again.");
-        }
-
-        // insert next things here after testing123 is done.
-
-        // $this->infos->lastFullImportComplete = true; // should set true when EVERYTHING was finished correctly
-        $this->writeInfoFile();
-        $processEnded = Carbon::now();
-
-        $this->line('');
-        $this->line("Incremental import process completed! 🎉");
-        $this->info("Process started on: {$processStarted->toDatetimeString()}.");
-        $this->info("Process ended on: {$processEnded->toDatetimeString()}.");
-        $this->line("Duration in minutes: {$processStarted->diffInMinutes($processEnded)}.");
-        $this->line("Duration in hours: {$processStarted->diffInHours($processEnded)}.");
-        $this->line("");
+        dd("yolo");
     }
 
     private function downloadFiles($group, $debug = false)
@@ -200,6 +150,7 @@ class EPFImporter extends Command
         $this->line("We're starting to download the '{$group}' group of files. Depending on your connection, this might take a long time!");
 
         $links = $this->epf->links->get($group);
+        $this->downloadedFiles = collect();
 
         if ($debug) {
             $this->comment("⚠️  We're only getting the 'match' files, because this is a test! ⚠️ ");
@@ -294,6 +245,80 @@ class EPFImporter extends Command
                 }
             },
         ]);
+
+        $this->downloadedFiles->push($pathToSaveTo);
+    }
+
+    private function startFullImportProcess()
+    {
+        $this->line('');
+        $this->line("We're starting the process for a full import. Have you for your ☕ yet?");
+
+        $processStarted = Carbon::now();
+        $epfDate = $this->epf->fullImportTime;
+        $shouldImport = is_null($this->infos->lastFullImportDate) ? true : $this->infos->lastFullImportDate->lte($epfDate);
+
+        if ($shouldImport && $this->infos->lastFullImportComplete == false) {
+            $this->info("Either your latest full import is not up to date, or the latest seems to not have been completed successfully. In any case, we have to download the files [again].");
+
+            $this->infos->lastFullImportDate = $epfDate;
+            $this->infos->lastFullImportComplete = false;
+            $this->writeInfoFile();
+            
+            $this->downloadFiles("full");
+        } else {
+            $this->info("The latest full import you made is up to date, we won't be downloading the files again.");
+        }
+
+        // insert next things here after testing123 is done.
+
+        // $this->infos->lastFullImportComplete = true; // should set true when EVERYTHING was finished correctly
+        $this->writeInfoFile();
+        $processEnded = Carbon::now();
+
+        $this->line('');
+        $this->line("Full import process completed! 🎉");
+        $this->info("Process started on: {$processStarted->toDatetimeString()}.");
+        $this->info("Process ended on: {$processEnded->toDatetimeString()}.");
+        $this->line("Duration in minutes: {$processStarted->diffInMinutes($processEnded)}.");
+        $this->line("Duration in hours: {$processStarted->diffInHours($processEnded)}.");
+        $this->line("");
+    }
+
+    private function startIncrementalImportProcess()
+    {
+        $this->line('');
+        $this->line("We're starting the process for an incremental import. Have you for your ☕ yet?");
+
+        $processStarted = Carbon::now();
+        $epfDate = $this->epf->incrementalImportTime;
+        $shouldImport = is_null($this->infos->lastIncrementalImportDate) ? true : $this->infos->lastIncrementalImportDate->lte($epfDate);
+
+        if ($shouldImport && $this->infos->lastIncrementalImportComplete == false) {
+            $this->info("Either your latest incremental import is not up to date, or the latest seems to not have been completed successfully. In any case, we have to download the files [again].");
+
+            $this->infos->lastIncrementalImportDate = $epfDate;
+            $this->infos->lastIncrementalImportComplete = false;
+            $this->writeInfoFile();
+            
+            $this->downloadFiles("incremental");
+        } else {
+            $this->info("The latest incremental import you made is up to date, we won't be downloading the files again.");
+        }
+
+        // insert next things here after testing123 is done.
+
+        // $this->infos->lastFullImportComplete = true; // should set true when EVERYTHING was finished correctly
+        $this->writeInfoFile();
+        $processEnded = Carbon::now();
+
+        $this->line('');
+        $this->line("Incremental import process completed! 🎉");
+        $this->info("Process started on: {$processStarted->toDatetimeString()}.");
+        $this->info("Process ended on: {$processEnded->toDatetimeString()}.");
+        $this->line("Duration in minutes: {$processStarted->diffInMinutes($processEnded)}.");
+        $this->line("Duration in hours: {$processStarted->diffInHours($processEnded)}.");
+        $this->line("");
     }
 
     private function writeInfoFile($where = null)
