@@ -14,7 +14,7 @@ class EPFFileImporter
     protected $specialChars;
     protected $exportType;
     protected $columns;
-    protected $primaryKey;
+    protected $primaryKeys;
 
     public function __construct($file)
     {
@@ -37,13 +37,15 @@ class EPFFileImporter
         $tableExists = Schema::connection($this->connection)->hasTable($tableName);
 
         if (!$tableExists) {
+            $primaryKeys = implode(",", $this->primaryKeys->toArray());
             $columns = collect();
+
             $this->columns->each(function ($type, $name) use ($columns) {
                 $columns->push("{$name} {$type}");
             });
 
             $columns = implode(", ", $columns->toArray());
-            $sql = "CREATE TABLE {$tableName} ({$columns}, PRIMARY KEY ($this->primaryKey));";
+            $sql = "CREATE TABLE {$tableName} ({$columns}, PRIMARY KEY ($primaryKeys));";
 
             DB::connection($this->connection)->statement($sql);
         }
@@ -51,10 +53,6 @@ class EPFFileImporter
 
     private function getRelevantInformationFromFile()
     {
-        // $this->linesTotal = "";
-        // $this->lines = $this->getTotalNumberofLines();
-        // $this->file->seek
-
         while (!$this->file->eof()) {
             $line = $this->file->fgets(); // get the line
             $line = str_replace($this->specialChars->rs, "", $line); // remove record separator, we already read line by line anyway
@@ -92,7 +90,9 @@ class EPFFileImporter
 
     private function getPrimaryKey($line)
     {
-        $this->primaryKey = str_replace("#primaryKey:", "", $line); // remove comment character and info
+        
+        $line = str_replace("#primaryKey:", "", $line); // remove comment character and info
+        $this->primaryKeys = collect(explode($this->specialChars->fs, $line));
     }
 
     private function getColumnNames($line)
