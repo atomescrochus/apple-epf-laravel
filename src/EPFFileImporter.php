@@ -15,6 +15,7 @@ class EPFFileImporter
     protected $exportType;
     protected $columns;
     protected $primaryKeys;
+    public $duration;
 
     public function __construct($file)
     {
@@ -31,24 +32,36 @@ class EPFFileImporter
         $this->checkForTable();
     }
 
-    public function checkForTable()
+    public function startImport()
     {
-        $tableName = $this->file->getFilename();
-        $tableExists = Schema::connection($this->connection)->hasTable($tableName);
+        $start = Carbon::now();
+        // fetch the model based on the file name
+        $model = "Atomescrochus\EPF\Models\Pivots\\";
+        $model .= studly_case($this->file->getFilename());
 
-        if (!$tableExists) {
-            $primaryKeys = implode(",", $this->primaryKeys->toArray());
-            $columns = collect();
+        $this->file->seek(0);
 
-            $this->columns->each(function ($type, $name) use ($columns) {
-                $columns->push("{$name} {$type}");
-            });
+        while (!$this->file->eof()) {
+            $line = $this->file->fgets();
+        
+            if ($line != "" && !str_contains($line, "#")) {
+                //a.k.a not the last, or a comment
+                
+                $line = str_replace($this->specialChars->rs, "", $line); // remove record separator
+                $values = explode($this->specialChars->fs, $line); // divide values
+                $columns = collect($this->columns->keys());
+                $data = collect();
 
-            $columns = implode(", ", $columns->toArray());
-            $sql = "CREATE TABLE {$tableName} ({$columns}, PRIMARY KEY ($primaryKeys));";
+                $columns->each(function ($name, $key) use ($data, $values) {
+                    $value = empty($values[$key]) ? null : $values[$key];
+                    $data->put($name, $value);
+                });
 
-            DB::connection($this->connection)->statement($sql);
+                $row = $model::updateOrCreate($data->toArray());
+            }
         }
+
+        $this->duration = $start->diffinSeconds(Carbon::now());
     }
 
     private function getRelevantInformationFromFile()
@@ -83,6 +96,26 @@ class EPFFileImporter
         }
     }
 
+    private function checkForTable()
+    {
+        $tableName = $this->file->getFilename();
+        $tableExists = Schema::connection($this->connection)->hasTable($tableName);
+
+        if (!$tableExists) {
+            $primaryKeys = implode(",", $this->primaryKeys->toArray());
+            $columns = collect();
+
+            $this->columns->each(function ($type, $name) use ($columns) {
+                $columns->push("{$name} {$type}");
+            });
+
+            $columns = implode(", ", $columns->toArray());
+            $sql = "CREATE TABLE {$tableName} ({$columns}, PRIMARY KEY($primaryKeys));";
+
+            DB::connection($this->connection)->statement($sql);
+        }
+    }
+
     private function getExportType($line)
     {
         $this->exportType = str_replace("#exportMode:", "", $line); // remove comment character and info
@@ -113,11 +146,5 @@ class EPFFileImporter
         }
 
         $this->columns = $columns;
-    }
-
-    public function getTotalNumberofLines()
-    {
-        $this->file->seek(PHP_INT_MAX);
-        return $this->file->key() + 1;
     }
 }

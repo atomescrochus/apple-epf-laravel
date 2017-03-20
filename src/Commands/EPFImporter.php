@@ -108,8 +108,8 @@ class EPFImporter extends Command
 
         $processStarted = Carbon::now();
         
-        // $this->downloadFiles("incremental", true);
-        // $this->extractFiles("incremental");
+        $this->downloadFiles("incremental", true);
+        $this->extractFiles("incremental");
         $this->importFiles("incremental");
 
         // next things:
@@ -129,31 +129,37 @@ class EPFImporter extends Command
 
     private function importFiles($group)
     {
+        $this->line("");
+        $this->line("We'll start to ingest the files to the database. Hang on!");
 
-        // $folders = $this->downloadedFiles->reject(function ($filename) {
-        //     return str_contains($filename, ".md5");
-        // })->map(function ($path) {
-        //     $path = pathinfo($path);
-        //     return $path['filename'];
-        // });
+        $folders = $this->downloadedFiles->reject(function ($filename) {
+            return str_contains($filename, ".md5");
+        })->map(function ($path) {
+            $path = pathinfo($path);
+            return $path['filename'];
+        });
 
-        // $filesToImport = $folders->map(function ($folder) use ($group) {
-        //     $files = Storage::files("{$this->storagePathToEpfImport}/{$group}/{$folder}");
-        //     $pathToFile = "{$this->fullPathToEpfImport}{$group}/{$folder}/";
+        $filesToImport = $folders->flatMap(function ($folder) use ($group) {
+            $files = Storage::files("{$this->storagePathToEpfImport}/{$group}/{$folder}");
+            $pathToFile = "{$this->fullPathToEpfImport}{$group}/{$folder}/";
 
-        //     return collect($files)->map(function ($file) use ($pathToFile) {
-        //         $filename = basename($file);
-        //         return "{$pathToFile}{$filename}";
-        //     });
-        // });
-        //
+            return collect($files)->map(function ($file) use ($pathToFile) {
+                $filename = basename($file);
+                return "{$pathToFile}{$filename}";
+            });
+        });
+        
         //uncomment above, and remove under after tests are done
-        $filesToImport = collect(['/Users/jpmurray/Repositories/workbench/storage/app/epf-imports//incremental/match20170320/artist_match']);
+        // $filesToImport = collect(['/Users/jpmurray/Repositories/workbench/storage/app/epf-imports//incremental/match20170320/artist_match']);
 
         $filesToImport->each(function ($file) {
             $epfImport = new EPFFileImporter($file);
-            dd($epfImport);
+            $this->line("Starting to import {$file}!");
+            $epfImport->startImport();
+            $this->comment("Finished importing last file in {$epfImport->duration} seconds.");
         });
+
+        $this->line("All files have been ingested! 🎉");
     }
 
     private function extractFiles($group)
