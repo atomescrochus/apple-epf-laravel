@@ -165,14 +165,19 @@ class EPFImporter extends Command
             return str_contains($filename, ".md5");
         });
         $extractTo = "{$this->fullPathToEpfImport}{$group}";
+        $deletePath = "{$this->storagePathToEpfImport}{$group}/";
 
         $zippy = Zippy::load();
 
-        $toExtract->each(function ($file) use ($zippy, $extractTo) {
+        $toExtract->each(function ($file) use ($zippy, $extractTo, $deletePath) {
+            $filename = basename($file);
             $this->line("Extracting {$file}");
             $archive = $zippy->open($file, '.tar.bz2');
             $archive->extract($extractTo);
+
             $this->info("Extraction of {$file} completed.");
+            Storage::delete("{$deletePath}{$filename}");
+            $this->info("Deletion of of {$file} completed.");
         });
     }
 
