@@ -6,8 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class SongMatch extends Model
 {
+    use ExportDate;
+
     public $timestamps = false;
-    
     protected $connection = 'apple-epf';
     protected $table = 'song_match';
     protected $primaryKey = "song_id";

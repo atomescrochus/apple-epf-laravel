@@ -5,15 +5,15 @@ namespace Atomescrochus\EPF\Models\iTunes;
 use Atomescrochus\EPF\Traits\ExportDate;
 use Illuminate\Database\Eloquent\Model;
 
-class Genre extends Model
+class GenreCollection extends Model
 {
     use ExportDate;
 
     public $timestamps = false;
     protected $connection = 'apple-epf';
-    protected $table = 'genre';
+    protected $table = 'genre_collection';
     protected $primaryKey = "genre_id";
-    protected $fillable = ['export_date', 'genre_id', 'parent_id', 'name'];
+    protected $fillable = ['export_date', 'genre_id', 'collection_id', 'is_primary_collection'];
 
     // relationships
     

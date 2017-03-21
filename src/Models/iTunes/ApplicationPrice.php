@@ -2,16 +2,14 @@
 
 namespace Atomescrochus\EPF\Models\iTunes;
 
-use Atomescrochus\EPF\Traits\ExportDate;
 use Illuminate\Database\Eloquent\Model;
 
-class Storefront extends Model
+class ApplicationPrice extends Model
 {
-    use ExportDate;
-
     public $timestamps = false;
+    
     protected $connection = 'apple-epf';
-    protected $table = 'storefront';
+    protected $table = 'application_price';
     protected $primaryKey = "storefront_id";
-    protected $fillable = ['export_date', 'storefront_id', 'country_code', 'name'];
+    protected $fillable = ['export_date', 'application_id', 'retail_price', 'currency_code', 'storefront_id'];
 }

@@ -7,49 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class Video extends Model
 {
-
     use ExportDate;
 
+    public $timestamps = false;
     protected $connection = 'apple-epf';
     protected $table = 'video';
     protected $primaryKey = "video_id";
-
-    // accessors
-
-    public function getItunesReleaseDateAttribute($date)
-    {
-        return \Carbon\Carbon::parse($date);
-    }
-
-    public function getOriginalReleaseDateAttribute($date)
-    {
-        return \Carbon\Carbon::parse($date);
-    }
-
-    // relationships
-
-    public function artists()
-    {
-        return $this->belongsToMany(\Atomescrochus\EPF\Models\Artist::class, 'artist_video', 'video_id', 'artist_id');
-    }
-
-    public function collections()
-    {
-        return $this->belongsToMany(\Atomescrochus\EPF\Models\Collection::class, 'collection_video', 'video_id', 'collection_id');
-    }
-
-    public function genres()
-    {
-        return $this->belongsToMany(Genre::class, 'genre_video', 'video_id', 'genre_id');
-    }
-
-    public function parentalAdvisory()
-    {
-        return $this->belongsTo(ParentalAdvisory::class, 'parental_advisory_id');
-    }
-
-    public function type()
-    {
-        return $this->belongsTo(\Atomescrochus\EPF\Models\MediaType::class, 'media_type_id', 'media_type_id');
-    }
+    protected $fillable = ['export_date', 'video_id', 'name','title_version', 'search_terms', 'parental_advisory_id', 'artist_display_name', 'collection_display_name', 'media_type', 'view_url', 'artwork_url', 'original_release_date','itunes_release_date', 'studio_name', 'network_name', 'content_provider', 'track_length', 'copyright', 'p_line', 'short_description', 'long_description', 'episode_production_number'];
 }
