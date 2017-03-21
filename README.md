@@ -13,19 +13,19 @@ This package will ultimately provides models and other tools to use Apple's Ente
 
 ## Noteworthy notes to note
 
-## The EPF files are HUGE
+### The EPF files are HUGE
 
-I'm am curently working (on `develop`) on a console command that will download and import the files directly from Apple's Enterprise Partner Feed servers to yours, then into your database. You *will* need a lot of disk space, this is not a process for 5$ (or less!) VPSs! For example:
+I'm am curently working (on `develop`) on a console command that will download and import the files directly from Apple's Enterprise Partner Feed servers to yours, then ingest into your database. You *will* need a lot of disk space, this is not a process for 5$ (or less!) VPSs! For example:
 
 In march 2017, I used the tool to download all of the file required for a "full" import of the database. I created a [20$ Digital Ocean droplet](https://m.do.co/c/025d0df24a5a), who comes with a pretty seedy 1Gbps network in. The total size of the download at the moment was approximately 30gb and it took 16 minutes 11 seconds. Make your speed is good, or be patient!
 
-## Something is missing
+### Things that still needs attention
 
-- There is curently no models for the table `video_translation`: I could not successfully import it locally (yet), so there is no way for me to work with it, hence try to make a model for it. If anyone can help with that, a PR would be very welcomed!
+There is no defined relationship on the models. This is on the todo list, but if anyone wants to contribute, the [schema can be found here](https://affiliate.itunes.apple.com/resources/documentation/itunes-enterprise-partner-feed/), PRs are welcomed! ;-)
 
 ## Installation
 
-Important: The packages requires `wget` to be installed on your system.
+Important: The packages requires `wget` to be installed on your system (TODO: move that to Guzzle!).
 
 You can install the package via composer:
 
@@ -86,13 +86,7 @@ In my opinion, it is easier to keep the EPF database separate from your Laravel 
 ],
 ```
 
-**NOTE: this package's models will be looking for the connection with the name "apple-epf", do not change it.**
-
-```php
-// base usage of class.
-$epf = new Atomescrochus\EPF();
-echo $epf->echoPhrase("I'm alive!");
-```
+**NOTE: this package's models will be looking for the connection with the name "apple-epf", do not change it in the above code.**
 
 ## Testing
 

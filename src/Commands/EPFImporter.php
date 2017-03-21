@@ -113,7 +113,6 @@ class EPFImporter extends Command
         $this->importFiles("incremental");
 
         // next things:
-        // do all models
         // delete files
         // check all workflows
         // test on a vps
