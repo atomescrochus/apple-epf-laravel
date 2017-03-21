@@ -101,20 +101,35 @@ class EPFImporter extends Command
         }
     }
 
-    public function testProcess()
+    private function startFullImportProcess()
     {
         $this->line('');
-        $this->line("🤖  Hello admin. We'll be starting a test with a limited set of files. You can always tweak stuff in the code, this is not intended for production use.");
+        $this->line("We're starting the process for a full import. Have you for your ☕ yet?");
 
         $processStarted = Carbon::now();
-        
-        $this->downloadFiles("incremental", true);
-        $this->extractFiles("incremental");
-        $this->importFiles("incremental");
+        $epfDate = $this->epf->fullImportTime;
+        $shouldImport = is_null($this->infos->lastFullImportDate) ? true : $this->infos->lastFullImportDate->lte($epfDate);
 
+        if ($shouldImport && $this->infos->lastFullImportComplete == false) {
+            $this->info("Either your latest full import is not up to date, or the latest seems to not have been completed successfully. In any case, we have to download the files [again].");
+
+            $this->infos->lastFullImportDate = $epfDate;
+            $this->infos->lastFullImportComplete = false;
+            $this->writeInfoFile();
+            
+            $this->downloadFiles("full");
+            $this->extractFiles("full");
+            $this->importFiles("full");
+        } else {
+            $this->info("The latest full import you made is up to date, we won't be doing anything.");
+        }
+
+        $this->infos->lastFullImportComplete = true; // should set true when EVERYTHING was finished correctly
+        $this->writeInfoFile();
         $processEnded = Carbon::now();
 
-        $this->line("Test import process completed! 🎉");
+        $this->line('');
+        $this->line("Full import process completed! 🎉");
         $this->info("Process started on: {$processStarted->toDatetimeString()}.");
         $this->info("Process ended on: {$processEnded->toDatetimeString()}.");
         $this->line("Duration in minutes: {$processStarted->diffInMinutes($processEnded)}.");
@@ -122,62 +137,40 @@ class EPFImporter extends Command
         $this->line("");
     }
 
-    private function importFiles($group)
+    private function startIncrementalImportProcess()
     {
+        $this->line('');
+        $this->line("We're starting the process for an incremental import. Have you for your ☕ yet?");
+
+        $processStarted = Carbon::now();
+        $epfDate = $this->epf->incrementalImportTime;
+        $shouldImport = is_null($this->infos->lastIncrementalImportDate) ? true : $this->infos->lastIncrementalImportDate->lte($epfDate);
+
+        if ($shouldImport && $this->infos->lastIncrementalImportComplete == false) {
+            $this->info("Either your latest incremental import is not up to date, or the latest seems to not have been completed successfully. In any case, we have to download the files [again].");
+
+            $this->infos->lastIncrementalImportDate = $epfDate;
+            $this->infos->lastIncrementalImportComplete = false;
+            $this->writeInfoFile();
+            
+            $this->downloadFiles("full");
+            $this->extractFiles("full");
+            $this->importFiles("full");
+        } else {
+            $this->info("The latest incremental import you made is up to date, we won't be doing anything.");
+        }
+
+        $this->infos->lastIncrementalImportComplete = true; // should set true when EVERYTHING was finished correctly
+        $this->writeInfoFile();
+        $processEnded = Carbon::now();
+
+        $this->line('');
+        $this->line("Incremental import process completed! 🎉");
+        $this->info("Process started on: {$processStarted->toDatetimeString()}.");
+        $this->info("Process ended on: {$processEnded->toDatetimeString()}.");
+        $this->line("Duration in minutes: {$processStarted->diffInMinutes($processEnded)}.");
+        $this->line("Duration in hours: {$processStarted->diffInHours($processEnded)}.");
         $this->line("");
-        $this->line("We'll start to ingest the files to the database. Hang on!");
-
-        $folders = $this->downloadedFiles->reject(function ($filename) {
-            return str_contains($filename, ".md5");
-        })->map(function ($path) {
-            $path = pathinfo($path);
-            return $path['filename'];
-        });
-
-        $filesToImport = $folders->flatMap(function ($folder) use ($group) {
-            $files = Storage::files("{$this->storagePathToEpfImport}/{$group}/{$folder}");
-            $pathToFile = "{$this->fullPathToEpfImport}{$group}/{$folder}/";
-
-            return collect($files)->map(function ($file) use ($pathToFile) {
-                $filename = basename($file);
-                return "{$pathToFile}{$filename}";
-            });
-        });
-
-        $filesToImport->each(function ($file) {
-            $epfImport = new EPFFileImporter($file);
-            $this->line("Starting to import {$file}!");
-            $epfImport->startImport();
-            $this->comment("Finished this file. I've imported {$epfImport->totalRows} rows in {$epfImport->duration} seconds ⏱");
-
-            $epfImport = null;
-            unlink($file);
-            $this->info("Deletion of {$file} done.");
-        });
-
-        $this->line("All files have been ingested! 🎉");
-    }
-
-    private function extractFiles($group)
-    {
-        $toExtract = $this->downloadedFiles->reject(function ($filename) {
-            return str_contains($filename, ".md5");
-        });
-        $extractTo = "{$this->fullPathToEpfImport}{$group}";
-        $deletePath = "{$this->storagePathToEpfImport}{$group}/";
-
-        $zippy = Zippy::load();
-
-        $toExtract->each(function ($file) use ($zippy, $extractTo, $deletePath) {
-            $filename = basename($file);
-            $this->line("Extracting {$file}");
-            $archive = $zippy->open($file, '.tar.bz2');
-            $archive->extract($extractTo);
-
-            $this->info("Extraction of {$file} completed.");
-            Storage::delete("{$deletePath}{$filename}");
-            $this->info("Deletion of {$file} done.");
-        });
     }
 
     private function downloadFiles($group, $debug = false)
@@ -229,6 +222,64 @@ class EPFImporter extends Command
                 die("Aborted. Catch you on the flip side.");
             }
         }
+    }
+
+    private function extractFiles($group)
+    {
+        $toExtract = $this->downloadedFiles->reject(function ($filename) {
+            return str_contains($filename, ".md5");
+        });
+        $extractTo = "{$this->fullPathToEpfImport}{$group}";
+        $deletePath = "{$this->storagePathToEpfImport}{$group}/";
+
+        $zippy = Zippy::load();
+
+        $toExtract->each(function ($file) use ($zippy, $extractTo, $deletePath) {
+            $filename = basename($file);
+            $this->line("Extracting {$file}");
+            $archive = $zippy->open($file, '.tar.bz2');
+            $archive->extract($extractTo);
+
+            $this->info("Extraction of {$file} completed.");
+            Storage::delete("{$deletePath}{$filename}");
+            $this->info("Deletion of {$file} done.");
+        });
+    }
+
+    private function importFiles($group)
+    {
+        $this->line("");
+        $this->line("We'll start to ingest the files to the database. Hang on!");
+
+        $folders = $this->downloadedFiles->reject(function ($filename) {
+            return str_contains($filename, ".md5");
+        })->map(function ($path) {
+            $path = pathinfo($path);
+            return $path['filename'];
+        });
+
+        $filesToImport = $folders->flatMap(function ($folder) use ($group) {
+            $files = Storage::files("{$this->storagePathToEpfImport}/{$group}/{$folder}");
+            $pathToFile = "{$this->fullPathToEpfImport}{$group}/{$folder}/";
+
+            return collect($files)->map(function ($file) use ($pathToFile) {
+                $filename = basename($file);
+                return "{$pathToFile}{$filename}";
+            });
+        });
+
+        $filesToImport->each(function ($file) {
+            $epfImport = new EPFFileImporter($file);
+            $this->line("Starting to import {$file}!");
+            $epfImport->startImport();
+            $this->comment("Finished this file. I've imported {$epfImport->totalRows} rows in {$epfImport->duration} seconds ⏱");
+
+            $epfImport = null;
+            unlink($file);
+            $this->info("Deletion of {$file} done.");
+        });
+
+        $this->line("All files have been ingested! 🎉");
     }
 
     private function verifyFileHash($filename, $group)
@@ -285,78 +336,6 @@ class EPFImporter extends Command
         $this->downloadedFiles->push($pathToSaveTo);
     }
 
-    private function startFullImportProcess()
-    {
-        $this->line('');
-        $this->line("We're starting the process for a full import. Have you for your ☕ yet?");
-
-        $processStarted = Carbon::now();
-        $epfDate = $this->epf->fullImportTime;
-        $shouldImport = is_null($this->infos->lastFullImportDate) ? true : $this->infos->lastFullImportDate->lte($epfDate);
-
-        if ($shouldImport && $this->infos->lastFullImportComplete == false) {
-            $this->info("Either your latest full import is not up to date, or the latest seems to not have been completed successfully. In any case, we have to download the files [again].");
-
-            $this->infos->lastFullImportDate = $epfDate;
-            $this->infos->lastFullImportComplete = false;
-            $this->writeInfoFile();
-            
-            $this->downloadFiles("full");
-        } else {
-            $this->info("The latest full import you made is up to date, we won't be downloading the files again.");
-        }
-
-        // insert next things here after testing123 is done.
-
-        // $this->infos->lastFullImportComplete = true; // should set true when EVERYTHING was finished correctly
-        $this->writeInfoFile();
-        $processEnded = Carbon::now();
-
-        $this->line('');
-        $this->line("Full import process completed! 🎉");
-        $this->info("Process started on: {$processStarted->toDatetimeString()}.");
-        $this->info("Process ended on: {$processEnded->toDatetimeString()}.");
-        $this->line("Duration in minutes: {$processStarted->diffInMinutes($processEnded)}.");
-        $this->line("Duration in hours: {$processStarted->diffInHours($processEnded)}.");
-        $this->line("");
-    }
-
-    private function startIncrementalImportProcess()
-    {
-        $this->line('');
-        $this->line("We're starting the process for an incremental import. Have you for your ☕ yet?");
-
-        $processStarted = Carbon::now();
-        $epfDate = $this->epf->incrementalImportTime;
-        $shouldImport = is_null($this->infos->lastIncrementalImportDate) ? true : $this->infos->lastIncrementalImportDate->lte($epfDate);
-
-        if ($shouldImport && $this->infos->lastIncrementalImportComplete == false) {
-            $this->info("Either your latest incremental import is not up to date, or the latest seems to not have been completed successfully. In any case, we have to download the files [again].");
-
-            $this->infos->lastIncrementalImportDate = $epfDate;
-            $this->infos->lastIncrementalImportComplete = false;
-            $this->writeInfoFile();
-            
-            $this->downloadFiles("incremental");
-        } else {
-            $this->info("The latest incremental import you made is up to date, we won't be downloading the files again.");
-        }
-
-        // insert next things here after testing123 is done.
-
-        // $this->infos->lastFullImportComplete = true; // should set true when EVERYTHING was finished correctly
-        $this->writeInfoFile();
-        $processEnded = Carbon::now();
-
-        $this->line('');
-        $this->line("Incremental import process completed! 🎉");
-        $this->info("Process started on: {$processStarted->toDatetimeString()}.");
-        $this->info("Process ended on: {$processEnded->toDatetimeString()}.");
-        $this->line("Duration in minutes: {$processStarted->diffInMinutes($processEnded)}.");
-        $this->line("Duration in hours: {$processStarted->diffInHours($processEnded)}.");
-        $this->line("");
-    }
-
     private function writeInfoFile($where = null)
     {
         $toSave = clone $this->infos;
@@ -383,5 +362,31 @@ class EPFImporter extends Command
 
             $this->infos = $content;
         }
+    }
+
+
+    /**
+     * This is only called for testing purpose. Should be deleted soon enough.
+     * @return [type] [description]
+     */
+    private function testProcess()
+    {
+        $this->line('');
+        $this->line("🤖  Hello admin. We'll be starting a test with a limited set of files. You can always tweak stuff in the code, this is not intended for production use.");
+
+        $processStarted = Carbon::now();
+        
+        $this->downloadFiles("incremental", true);
+        $this->extractFiles("incremental");
+        $this->importFiles("incremental");
+
+        $processEnded = Carbon::now();
+
+        $this->line("Test import process completed! 🎉");
+        $this->info("Process started on: {$processStarted->toDatetimeString()}.");
+        $this->info("Process ended on: {$processEnded->toDatetimeString()}.");
+        $this->line("Duration in minutes: {$processStarted->diffInMinutes($processEnded)}.");
+        $this->line("Duration in hours: {$processStarted->diffInHours($processEnded)}.");
+        $this->line("");
     }
 }
