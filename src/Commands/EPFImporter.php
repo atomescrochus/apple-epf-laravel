@@ -112,11 +112,6 @@ class EPFImporter extends Command
         $this->extractFiles("incremental");
         $this->importFiles("incremental");
 
-        // next things:
-        // delete files
-        // check all workflows
-        // test on a vps
-
         $processEnded = Carbon::now();
 
         $this->line("Test import process completed! 🎉");
@@ -153,7 +148,11 @@ class EPFImporter extends Command
             $epfImport = new EPFFileImporter($file);
             $this->line("Starting to import {$file}!");
             $epfImport->startImport();
-            $this->comment("Finished last file. I've imported {$epfImport->totalRows} rows in {$epfImport->duration} seconds ⏱");
+            $this->comment("Finished this file. I've imported {$epfImport->totalRows} rows in {$epfImport->duration} seconds ⏱");
+
+            $epfImport = null;
+            unlink($file);
+            $this->info("Deletion of {$file} done.");
         });
 
         $this->line("All files have been ingested! 🎉");
@@ -177,7 +176,7 @@ class EPFImporter extends Command
 
             $this->info("Extraction of {$file} completed.");
             Storage::delete("{$deletePath}{$filename}");
-            $this->info("Deletion of of {$file} completed.");
+            $this->info("Deletion of {$file} done.");
         });
     }
 

@@ -64,6 +64,7 @@ class EPFFileImporter
             }
         }
 
+        $this->file = null;
         $this->duration = $start->diffinSeconds(Carbon::now());
     }
 
