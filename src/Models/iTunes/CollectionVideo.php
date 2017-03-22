@@ -14,11 +14,4 @@ class CollectionVideo extends Model
     protected $table = 'collection_video';
     protected $primaryKey = "collection_id";
     protected $fillable = ['export_date', 'collection_type_id', 'video_id', 'track_number', 'volume_number', 'preorder_only'];
-
-    // relationships
-    
-    public function collections()
-    {
-        return $this->hasMany(Collection::class, 'collection_type_id');
-    }
 }

@@ -14,11 +14,4 @@ class DeviceType extends Model
     protected $table = 'device_type';
     protected $primaryKey = "device_type_id";
     protected $fillable = ['export_date', 'device_type_id', 'name'];
-
-    // relationships
-
-    public function applications()
-    {
-        return $this->belongsToMany(Application::class, 'application_device_type', 'device_type_id', 'application_id');
-    }
 }
