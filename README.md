@@ -38,12 +38,49 @@ You will have to publish the configuration files:
 php artisan vendor:publish --provider="Atomescrochus\EPF\EPFServiceProvider" --tag="config"
 ```
 
-You are also required to put your EPF login credentials in your .env files:
+You can see some basic configuration right in the published file.
+
+### And add a new connection to the database array
+
+You *have to* add another connection to your `config/database.php` file, this package will be looking for it. You could of course use the same credential as your main database, but to my experience, since EPF database is pretty huge, it's a good idea to keep things separate, it just make things easier.
+
+Below, you'll find the template of the connection to add. You can see we're using the `.env` file to set the connection infos, if necessary. You will have to add those variables to your own `.env`, don't forget!
+
+**This package's models will be looking for the connection with the name "apple-epf", do not change the connection name ot you will break things!**
+
+```php
+<?php // File: /config/database.php
+
+'connections' => [
+
+    // [...]
+
+    'apple-epf' => [
+        'driver' => 'mysql',
+        'host' => env('EPF_DB_HOST', '127.0.0.1'),
+        'port' => env('EPF_DB_PORT', '3306'),
+        'database' => env('EPF_DB_DATABASE', 'forge'),
+        'username' => env('EPF_DB_USERNAME', 'forge'),
+        'password' => env('EPF_DB_PASSWORD', ''),
+        'unix_socket' => env('EPF_DB_SOCKET', ''),
+        'collation' => 'utf8mb4_unicode_ci',
+        'prefix' => env('EPF_DB_PREFIX', ''),
+        'strict' => true,
+        'engine' => null,
+    ],
+
+],
+```
+
+### .env file
+You are also required to put your EPF login credentials in your .env files as below:
 
 ```
 EPF_USER_ID=12345678
 EPF_PASSWORD=abcdefg12345678
 ```
+
+Also, as stated earlier, you will have to add the database informations in here if you need to change the default values.
 
 ### Provider
 
@@ -61,32 +98,7 @@ Then add the ServiceProvider to your `config/app.php` file:
 
 ## Usage
 
-In my opinion, it is easier to keep the EPF database separate from your Laravel app. Now, you'll still need to configure Laravel for that different connection. You can do this by adding an additionnal connection to the relevant array in your `config/database.php` file like so:
-
-```php
-<?php // File: /config/database.php
-
-'connections' => [
-
-    // [...]
-
-    'apple-epf' => [ // this is your EPF database connection, where you imported EPF
-        'driver'    => 'mysql',
-        'host'      => 'localhost',
-        'database'  => 'apple_epf',
-        'username'  => 'admin',
-        'password'  => 'secret',
-        'charset'   => 'utf8',
-        'collation' => 'utf8mb4_general_ci',
-        'prefix'    => '',
-        'strict'    => false,
-        'engine'    => null,
-    ],
-
-],
-```
-
-**NOTE: this package's models will be looking for the connection with the name "apple-epf", do not change it in the above code.**
+Coming soon.
 
 ## Testing
 
