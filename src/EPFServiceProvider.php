@@ -1,6 +1,6 @@
 <?php
 
-namespace Appstract\Skeleton;
+namespace Atomescrochus\EPF;
 
 use Illuminate\Support\ServiceProvider;
 

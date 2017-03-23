@@ -11,54 +11,45 @@ This package will ultimately provides models and other tools to use Apple's Ente
 
 **This package do not provides EPF data, you will still have to download your own files.**
 
-## Noteworthy notes to note
-
-## The EPF files are HUGE
-
-I'm am curently working (on `develop`) on a console command that will download and import the files directly from Apple's Enterprise Partner Feed servers to yours, then into your database. You *will* need a lot of disk space, this is not a process for 5$ (or less!) VPSs! For example:
-
-In march 2017, I used the tool to download all of the file required for a "full" import of the database. I created a [20$ Digital Ocean droplet](https://m.do.co/c/025d0df24a5a), who comes with a pretty seedy 1Gbps network in. The total size of the download at the moment was approximately 30gb and it took 16 minutes 11 seconds. Make your speed is good, or be patient!
-
-## Something is missing
-
-- There is curently no models for the table `video_translation`: I could not successfully import it locally (yet), so there is no way for me to work with it, hence try to make a model for it. If anyone can help with that, a PR would be very welcomed!
-
 ## Installation
 
-Important: The packages requires `wget` to be installed on your system.
+Curently, the package only provides model. You can autoload them like any others.
 
-You can install the package via composer:
+## And add a new connection to the database array
 
-```bash
-composer require atomescrochus/apple-epf-laravel
-```
+You *have to* add another connection to your `config/database.php` file, this package will be looking for it. You could of course use the same credential as your main database, but to my experience, since EPF database is pretty huge, it's a good idea to keep things separate, it just make things easier.
 
-### Provider
+Below, you'll find the template of the connection to add. You can see we're using the `.env` file to set the connection infos, if necessary. You will have to add those variables to your own `.env`, don't forget!
 
-Then add the ServiceProvider to your `config/app.php` file:
+**This package's models will be looking for the connection with the name "apple-epf", do not change the connection name ot you will break things!**
 
 ```php
-'providers' => [
-    ...
+<?php // File: /config/database.php
 
-    Atomescrochus\EPF\EPFServiceProvider::class
+'connections' => [
 
-    ....
-]
+    // [...]
+
+    'apple-epf' => [
+        'driver' => 'mysql',
+        'host' => env('EPF_DB_HOST', '127.0.0.1'),
+        'port' => env('EPF_DB_PORT', '3306'),
+        'database' => env('EPF_DB_DATABASE', 'forge'),
+        'username' => env('EPF_DB_USERNAME', 'forge'),
+        'password' => env('EPF_DB_PASSWORD', ''),
+        'unix_socket' => env('EPF_DB_SOCKET', ''),
+        'collation' => 'utf8mb4_unicode_ci',
+        'prefix' => env('EPF_DB_PREFIX', ''),
+        'strict' => true,
+        'engine' => null,
+    ],
+
+],
 ```
 
 ## Usage
 
-```php
-$epf = new Atomescrochus\EPF();
-echo $epf->echoPhrase("I'm alive!");
-```
-
-## Testing
-
-```bash
-$ composer test
-```
+Autoload the models.
 
 ## Contributing
 
