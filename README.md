@@ -33,7 +33,19 @@ You can install the package via composer:
 composer require atomescrochus/apple-epf-laravel
 ```
 
-You will have to publish the configuration files:
+Add the ServiceProvider to your `config/app.php` file:
+
+```php
+'providers' => [
+    ...
+
+    Atomescrochus\EPF\EPFServiceProvider::class,
+
+    ....
+]
+```
+
+You will then have to publish the configuration files:
 ```bash
 php artisan vendor:publish --provider="Atomescrochus\EPF\EPFServiceProvider" --tag="config"
 ```
@@ -81,20 +93,6 @@ EPF_PASSWORD=abcdefg12345678
 ```
 
 Also, as stated earlier, you will have to add the database informations in here if you need to change the default values.
-
-### Provider
-
-Then add the ServiceProvider to your `config/app.php` file:
-
-```php
-'providers' => [
-    ...
-
-    Atomescrochus\EPF\EPFServiceProvider::class
-
-    ....
-]
-```
 
 ## Usage
 

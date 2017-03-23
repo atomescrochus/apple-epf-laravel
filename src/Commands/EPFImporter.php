@@ -292,10 +292,10 @@ class EPFImporter extends Command
         $md5StringAgainst = trim(substr(Storage::get($pathToMd5File), -33));
         
         if ($fileToCheck == $md5StringAgainst) {
-            $this->line("{$filename} checksum: ✅ passed!");
+            $this->line("{$filename} checksum: ✅  passed!");
             return true;
         } else {
-            $this->line("{$filename} checksum: ❌ failed!");
+            $this->line("{$filename} checksum: ❌  failed!");
             return false;
         }
     }
