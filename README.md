@@ -13,46 +13,15 @@ This package will ultimately provides models and other tools to use Apple's Ente
 
 ## Noteworthy notes to note
 
-### The EPF files are HUGE
-
-I'm am curently working (on `develop`) on a console command that will download and import the files directly from Apple's Enterprise Partner Feed servers to yours, then ingest into your database. You *will* need a lot of disk space, this is not a process for 5$ (or less!) VPSs! For example:
-
-In march 2017, I used the tool to download all of the file required for a "full" import of the database. I created a [20$ Digital Ocean droplet](https://m.do.co/c/025d0df24a5a), who comes with a pretty seedy 1Gbps network in. The total size of the download at the moment was approximately 30gb and it took 16 minutes 11 seconds. Make your speed is good, or be patient!
-
 ### Things that still needs attention
 
 There is no defined relationship on the models. This is on the todo list, but if anyone wants to contribute, the [schema can be found here](https://affiliate.itunes.apple.com/resources/documentation/itunes-enterprise-partner-feed/), PRs are welcomed! ;-)
 
 ## Installation
 
-Important: The packages requires `wget` to be installed on your system (TODO: move that to Guzzle!).
+Curently, the package only provides model. You can autoload them like any others.
 
-You can install the package via composer:
-
-```bash
-composer require atomescrochus/apple-epf-laravel
-```
-
-Add the ServiceProvider to your `config/app.php` file:
-
-```php
-'providers' => [
-    ...
-
-    Atomescrochus\EPF\EPFServiceProvider::class,
-
-    ....
-]
-```
-
-You will then have to publish the configuration files:
-```bash
-php artisan vendor:publish --provider="Atomescrochus\EPF\EPFServiceProvider" --tag="config"
-```
-
-You can see some basic configuration right in the published file.
-
-### And add a new connection to the database array
+## And add a new connection to the database array
 
 You *have to* add another connection to your `config/database.php` file, this package will be looking for it. You could of course use the same credential as your main database, but to my experience, since EPF database is pretty huge, it's a good idea to keep things separate, it just make things easier.
 
@@ -84,25 +53,9 @@ Below, you'll find the template of the connection to add. You can see we're usin
 ],
 ```
 
-### .env file
-You are also required to put your EPF login credentials in your .env files as below:
-
-```
-EPF_USER_ID=12345678
-EPF_PASSWORD=abcdefg12345678
-```
-
-Also, as stated earlier, you will have to add the database informations in here if you need to change the default values.
-
 ## Usage
 
-Coming soon.
-
-## Testing
-
-```bash
-$ composer test
-```
+Autoload the models.
 
 ## Contributing
 
