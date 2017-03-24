@@ -22,7 +22,7 @@ class EPFImporter extends Command
      *
      * @var string
      */
-    protected $signature = 'epf:import {--type= : Type of import to perform. Either "full" or "incremental"}';
+    protected $signature = 'epf:importer {--type= : Type of import to perform. Either "full" or "incremental"}';
 
     /**
      * The console command description.

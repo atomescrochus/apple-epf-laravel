@@ -21,6 +21,7 @@ class EPFServiceProvider extends ServiceProvider
                     Commands\EPFImporter::class,
                     Commands\EPFDownloader::class,
                     Commands\EPFExtractor::class,
+                    Commands\EPFImportToDatabase::class,
                 ]);
             }
         }
