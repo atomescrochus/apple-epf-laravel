@@ -16,6 +16,9 @@ return [
     
     'include_artisan_cmd' => true,
 
+    'storage_folder' => 'epf-imports',
+    'archive_folder' => 'archives',
+    'extraction_folder' => 'files',
 
     
 ];
