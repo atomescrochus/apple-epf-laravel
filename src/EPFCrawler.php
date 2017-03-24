@@ -43,6 +43,8 @@ class EPFCrawler
 
         $this->currentIndexContent = "";
         $this->credentials = "";
+
+        dd($this->links);
     }
 
     private function getFullImportListOfFiles()
@@ -54,6 +56,8 @@ class EPFCrawler
 
         $links =  $links->reject(function ($link) {
             return str_contains($link->getUri(), 'incremental');
+        })->reject(function ($link) {
+            return str_contains($link->getUri(), '.md5');
         })->map(function ($link) {
             return $link->getUri();
         });
@@ -72,6 +76,8 @@ class EPFCrawler
 
         $links = $links->map(function ($link) {
             return $link->getUri();
+        })->reject(function ($link) {
+            return str_contains($link, '.md5');
         });
 
         $this->incrementalImportTime = $this->getDateFromFilename($links->first());
