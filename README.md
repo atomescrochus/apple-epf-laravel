@@ -11,12 +11,6 @@ This package provides models and other tools to use Apple's Enterprise Partner F
 
 **This package do not provides EPF data, you will still have to download your own files.**
 
-## Noteworthy notes to note
-
-### Things that still needs attention
-
-There is no defined relationship on the models. This is on the todo list, but if anyone wants to contribute, the [schema can be found here](https://affiliate.itunes.apple.com/resources/documentation/itunes-enterprise-partner-feed/), PRs are welcomed! ;-)
-
 ## Installation
 
 You can install the package via composer:
