@@ -2,23 +2,24 @@
 
 namespace Atomescrochus\EPF;
 
+use Atomescrochus\EPF\Traits\FeedCredentials;
+use Atomescrochus\EPF\Traits\FileStorage;
 use Carbon\Carbon;
+use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\DomCrawler\Crawler;
-use Symfony\Component\Process\Process;
 
 class EPFCrawler
 {
-    private $credentials;
+    use FeedCredentials;
+    use FileStorage;
 
-    protected $currentFullUrl;
-    protected $currentIncrementalUrl;
+    private $credentials;
+    protected $currentIndexContent;
     protected $currentCrawlerUrl;
-    protected $wgetSavePath;
-    protected $epfFolderName;
-    protected $currentIndexFileContent;
-    protected $indexFileFolder;
-    protected $currentIndexFolderName;
+
+    protected $urlForFullImportFiles;
+    protected $urlForIncrementalImportFiles;
 
     public $links;
     public $fullImportTime;
@@ -27,26 +28,29 @@ class EPFCrawler
     /**
      * Create a new Skeleton Instance.
      */
-    public function __construct($credentials)
+    public function __construct()
     {
-        $this->credentials = $credentials;
-        $this->currentFullUrl = "https://feeds.itunes.apple.com/feeds/epf/v3/full/current/";
-        $this->currentIncrementalUrl = "https://feeds.itunes.apple.com/feeds/epf/v3/full/current/incremental/current/";
-        $this->epfFolderName = "epf-imports/";
-        $this->currentIndexFolderName = "currentIndex";
-        $this->wgetSavePath = storage_path("app/{$this->epfFolderName}/{$this->currentIndexFolderName}");
-        $this->indexFileFolder = "{$this->epfFolderName}/currentIndex/";
+        $this->credentials = $this->getCredentials();
+        $this->paths = $this->getEPFFilesPaths();
+
+        $this->urlForFullImportFiles = "https://feeds.itunes.apple.com/feeds/epf/v3/full/current/";
+        $this->urlForIncrementalImportFiles = "https://feeds.itunes.apple.com/feeds/epf/v3/full/current/incremental/current/";
+
         $this->links = collect([
             'full' => $this->getFullImportListOfFiles(),
             'incremental' => $this->getIncrementalImportListOfFiles(),
         ]);
+
+        $this->currentIndexContent = "";
+        $this->credentials = "";
+        $this->currentCrawlerUrl = "";
     }
 
     private function getFullImportListOfFiles()
     {
         $this->crawlCurrentFolder();
 
-        $crawler = new Crawler($this->currentIndexFileContent, $this->currentCrawlerUrl);
+        $crawler = new Crawler($this->currentIndexContent, $this->currentCrawlerUrl);
         $links = collect($crawler->filter('table > tr > td > a')->links());
 
         $links =  $links->reject(function ($link) {
@@ -64,7 +68,7 @@ class EPFCrawler
     {
         $this->crawlCurrentFolder(true);
 
-        $crawler = new Crawler($this->currentIndexFileContent, $this->currentCrawlerUrl);
+        $crawler = new Crawler($this->currentIndexContent, $this->currentCrawlerUrl);
         $links = collect($crawler->filter('table > tr > td > a')->links());
 
         $links = $links->map(function ($link) {
@@ -85,15 +89,20 @@ class EPFCrawler
 
     private function crawlCurrentFolder($incremental = false)
     {
-        $this->currentCrawlerUrl = $incremental ? $this->currentIncrementalUrl : $this->currentFullUrl;
-        
-        $download = new Process("wget -c --user={$this->credentials->login} --password='{$this->credentials->password}' {$this->currentCrawlerUrl} -P {$this->wgetSavePath} --show-progress");
+        $this->currentCrawlerUrl = $incremental ? $this->urlForIncrementalImportFiles : $this->urlForFullImportFiles;
 
-        $download->start();
-        $download->wait();
+        Storage::put($this->paths->get('storage')->storage."/index.html", "");
 
-        $currentIndexFileLocation = $this->indexFileFolder."index.html";
-        $this->currentIndexFileContent = Storage::get($currentIndexFileLocation);
-        Storage::delete($currentIndexFileLocation);
+        $client = new Client();
+
+        $client->request('GET', $this->currentCrawlerUrl, [
+            'auth' => [$this->credentials->login, $this->credentials->password],
+            'sink' => $this->paths->get('system')->storage."/index.html",
+        ]);
+
+        $filePath = $this->paths->get('storage')->storage."/index.html";
+
+        $this->currentIndexContent = Storage::get($filePath);
+        Storage::delete($filePath);
     }
 }
