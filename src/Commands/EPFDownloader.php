@@ -82,10 +82,9 @@ class EPFDownloader extends Command
         $this->line("");
         $this->line("We're starting to download the '{$this->group}|{$this->type}' group of files. Depending on your connection, this might take a long time!");
 
-        $links = $this->epf->links->get($this->group);
+        $links = $this->epf->links->get($this->type);
         // $links = collect(["https://feeds.itunes.apple.com/feeds/epf/v3/full/current/incremental/current/match20170323.tbz"]); // debug only
         $countLinks = count($links);
-        
         $this->info("There is a total of {$countLinks} files to download.");
 
         $links->each(function ($link) {
