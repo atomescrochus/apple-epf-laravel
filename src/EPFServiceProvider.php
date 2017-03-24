@@ -20,6 +20,7 @@ class EPFServiceProvider extends ServiceProvider
                 $this->commands([
                     Commands\EPFImporter::class,
                     Commands\EPFDownloader::class,
+                    Commands\EPFExtractor::class,
                 ]);
             }
         }

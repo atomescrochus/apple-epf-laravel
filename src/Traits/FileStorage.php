@@ -14,7 +14,7 @@ trait FileStorage
             'storage' => storage_path("app/"),
             'epf_folder' => storage_path("app/".config('apple-epf.storage_folder')),
             'archive' => storage_path("app/".config('apple-epf.storage_folder')."/".config('apple-epf.archive_folder')),
-            'extraction' => storage_path("/app/".config('apple-epf.storage_folder')."/".config('apple-epf.extraction_folder')),
+            'extraction' => storage_path("app/".config('apple-epf.storage_folder')."/".config('apple-epf.extraction_folder')),
         ];
 
         $storagePaths = (object) [
