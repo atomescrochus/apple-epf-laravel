@@ -59,7 +59,13 @@ class EPFFileImporter
                     $data->put($name, $value);
                 });
 
-                $row = $model::updateOrCreate($data->toArray());
+                $primaryKey = [$this->primaryKeys->first() => $data->pull($this->primaryKeys->first())];
+
+                $row = $model::updateOrCreate(
+                    $primaryKey,
+                    $data->toArray()
+                );
+
                 $this->totalRows++;
             }
         }

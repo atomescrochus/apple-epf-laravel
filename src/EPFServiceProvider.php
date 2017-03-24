@@ -18,7 +18,6 @@ class EPFServiceProvider extends ServiceProvider
 
             if (config('apple-epf.include_artisan_cmd')) {
                 $this->commands([
-                    Commands\EPFImporter::class,
                     Commands\EPFDownloader::class,
                     Commands\EPFExtractor::class,
                     Commands\EPFImportToDatabase::class,
