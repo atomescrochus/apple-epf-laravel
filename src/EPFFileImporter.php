@@ -59,6 +59,14 @@ class EPFFileImporter
                     $data->put($name, $value);
                 });
 
+                $data = $data->map(function ($item, $key) {
+                    if (str_contains($key, "release_date")) {
+                        $item = str_replace(' ', '-', $item); // format correctly for mysql date time
+                    }
+
+                    return $item;
+                });
+
                 $primaryKey = [$this->primaryKeys->first() => $data->pull($this->primaryKeys->first())];
 
                 $row = $model::updateOrCreate(
