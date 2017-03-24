@@ -43,14 +43,13 @@ class EPFCrawler
 
         $this->currentIndexContent = "";
         $this->credentials = "";
-        $this->currentCrawlerUrl = "";
     }
 
     private function getFullImportListOfFiles()
     {
-        $this->crawlCurrentFolder();
+        $this->crawlCurrentFolder(false);
 
-        $crawler = new Crawler($this->currentIndexContent, $this->currentCrawlerUrl);
+        $crawler = new Crawler($this->currentIndexContent, $this->urlForFullImportFiles);
         $links = collect($crawler->filter('table > tr > td > a')->links());
 
         $links =  $links->reject(function ($link) {
@@ -68,7 +67,7 @@ class EPFCrawler
     {
         $this->crawlCurrentFolder(true);
 
-        $crawler = new Crawler($this->currentIndexContent, $this->currentCrawlerUrl);
+        $crawler = new Crawler($this->currentIndexContent, $this->urlForIncrementalImportFiles);
         $links = collect($crawler->filter('table > tr > td > a')->links());
 
         $links = $links->map(function ($link) {
@@ -89,19 +88,16 @@ class EPFCrawler
 
     private function crawlCurrentFolder($incremental = false)
     {
-        $this->currentCrawlerUrl = $incremental ? $this->urlForIncrementalImportFiles : $this->urlForFullImportFiles;
+        $currentCrawlerUrl = $incremental ? $this->urlForIncrementalImportFiles : $this->urlForFullImportFiles;
 
-        Storage::put($this->paths->get('storage')->storage."/index.html", "");
+        Storage::put($this->paths->get('storage')->epf_folder."/index.html", "");
 
         $client = new Client();
+        
+        $client->request('GET', $currentCrawlerUrl, ['auth' => [$this->credentials->login, $this->credentials->password],'sink' => $this->paths->get('system')->epf_folder."/index.html"]);
 
-        $client->request('GET', $this->currentCrawlerUrl, [
-            'auth' => [$this->credentials->login, $this->credentials->password],
-            'sink' => $this->paths->get('system')->storage."/index.html",
-        ]);
-
-        $filePath = $this->paths->get('storage')->storage."/index.html";
-
+        $filePath = $this->paths->get('storage')->epf_folder."/index.html";
+        
         $this->currentIndexContent = Storage::get($filePath);
         Storage::delete($filePath);
     }
