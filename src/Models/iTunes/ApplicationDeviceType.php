@@ -2,10 +2,13 @@
 
 namespace Atomescrochus\EPF\Models\iTunes;
 
+use Atomescrochus\EPF\Traits\ExportDate;
 use Illuminate\Database\Eloquent\Model;
 
 class ApplicationDeviceType extends Model
 {
+    use ExportDate;
+    
     public $timestamps = false;
     
     protected $connection = 'apple-epf';
