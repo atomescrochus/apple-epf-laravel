@@ -43,8 +43,6 @@ class EPFCrawler
 
         $this->currentIndexContent = "";
         $this->credentials = "";
-
-        dd($this->links);
     }
 
     private function getFullImportListOfFiles()
