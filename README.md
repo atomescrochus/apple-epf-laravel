@@ -19,11 +19,25 @@ There is no defined relationship on the models. This is on the todo list, but if
 
 ## Installation
 
-Curently, the package only provides model. You can autoload them like any others.
+You can install the package via composer:
 
-## And add a new connection to the database array
+```bash
+composer require atomescrochus/apple-epf-laravel
+```
 
-You *have to* add another connection to your `config/database.php` file, this package will be looking for it. You could of course use the same credential as your main database, but to my experience, since EPF database is pretty huge, it's a good idea to keep things separate, it just make things easier.
+Then add the ServiceProvider to your `config/app.php` file:
+
+```php
+'providers' => [
+    ...
+
+    Atomescrochus\EPF\EPFServiceProvider::class
+
+    ....
+]
+```
+
+You will *have to* add another connection to your `config/database.php` file, this package will be looking for it. You can of course use the same credential as your main database, but to my experience, since EPF database is pretty huge, it's a good idea to keep things separate, it just make things easier.
 
 Below, you'll find the template of the connection to add. You can see we're using the `.env` file to set the connection infos, if necessary. You will have to add those variables to your own `.env`, don't forget!
 
@@ -55,7 +69,15 @@ Below, you'll find the template of the connection to add. You can see we're usin
 
 ## Usage
 
-Autoload the models.
+If you want to only use the provided models to your own database, just autoload them like any other models.
+
+If you don't have your data yet, you can, if you provided your credentials to access the EPF feed to the `.env` file, use the following artisan commands:
+
+- `php artisan epf:download` will help your download the files;
+- `php artisan epf:extract` will extract the downloaded files;
+- `php artisan epf:import` will import the data to database using the `apple-epf` connection, using the provided models.
+
+**Be careful, you can use the `all` option when prompted while using the artisan command, but it's not advisable. The archives are huge, extracted files are huge, and the data in the database will be taking a lot of space also.** You should really try to import in parts as much as you can, so you can remove unecessary files to free up some space so you can finish the rest of the imports...
 
 ## Contributing
 
