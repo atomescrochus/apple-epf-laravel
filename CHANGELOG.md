@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.2.2 (2017-03-24)
+- Small work on song model relationship.
+
 ## 0.2.1 (2017-03-24)
 - Correctly converts EPF's files date time to compatible format (replaces spaces by dashes);
 
