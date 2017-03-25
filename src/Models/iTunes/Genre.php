@@ -14,4 +14,9 @@ class Genre extends Model
     protected $table = 'genre';
     protected $primaryKey = "genre_id";
     protected $fillable = ['export_date', 'genre_id', 'parent_id', 'name'];
+
+    public function songs()
+    {
+        return $this->belongsToMany(Song::class);
+    }
 }
