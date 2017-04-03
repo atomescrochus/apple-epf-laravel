@@ -2,6 +2,7 @@
 
 namespace Atomescrochus\EPF\Models\iTunes;
 
+use Atomescrochus\EPF\Models\iTunes\Genre;
 use Atomescrochus\EPF\Traits\ExportDate;
 use Illuminate\Database\Eloquent\Model;
 
@@ -18,4 +19,14 @@ class Collection extends Model
     protected $casts = [
         'is_compilation' => 'boolean',
     ];
+
+    public function genres()
+    {
+        return $this->belongsToMany(Genre::class, 'genre_collection', 'collection_id', 'genre_id');
+    }
+
+    public function getPrimaryGenreAttribute()
+    {
+        return $this->genres()->where('is_primary', 1)->first();
+    }
 }
