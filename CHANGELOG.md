@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.2.3 (2017-04-03)
+- Still working on relationships.
+
 ## 0.2.2 (2017-03-24)
 - Small work on song model relationship.
 
