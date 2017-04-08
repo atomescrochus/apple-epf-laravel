@@ -62,6 +62,7 @@ class EPFDownloader extends Command
      */
     public function handle()
     {
+        dd("yolo");
         $this->line("");
         $this->line("👋. Welcome to the Apple EPF downloader! 👋");
 
