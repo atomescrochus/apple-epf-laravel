@@ -19,7 +19,7 @@ You can install the package via composer:
 composer require atomescrochus/apple-epf-laravel
 ```
 
-Then add the ServiceProvider to your `config/app.php` file:
+Then you have to install the package' service provider, _unless you are running Laravel >=5.5_ (it'll use package auto-discovery) :
 
 ```php
 'providers' => [
