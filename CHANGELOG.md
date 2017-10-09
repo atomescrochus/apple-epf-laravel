@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.3.0 - 2017-10-09
+- Added support for Laravel 5.5 package autodiscovery.
+
 ## 0.2.3 (2017-04-03)
 - Still working on relationships.
 
