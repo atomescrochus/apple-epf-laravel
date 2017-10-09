@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.1 - 2017-10-09
+### Fix
+- Auto-discovery
+
 ## 0.3.0 - 2017-10-09
 - Added support for Laravel 5.5 package autodiscovery.
 
