@@ -62,7 +62,6 @@ class EPFDownloader extends Command
      */
     public function handle()
     {
-        dd("yolo");
         $this->line("");
         $this->line("👋. Welcome to the Apple EPF downloader! 👋");
 
@@ -127,13 +126,13 @@ class EPFDownloader extends Command
                     $this->bytesInPreviousIteration = 0; //
                     $this->downloadProgressBar = new ProgressBar($this->output, $downloadTotal);
                     $this->downloadProgressBar->setFormat('very_verbose');
-                } else if ($this->downloadProgressBar != null && $downloadTotal == $downloadedBytes) {
+                } elseif ($this->downloadProgressBar != null && $downloadTotal == $downloadedBytes) {
                     // there is a progress bar and the download it finished
                         
                     $this->downloadProgressBar->finish();
                     $this->downloadProgressBar->clear();
                     $this->downloadProgressBar = null;
-                } else if ($this->downloadProgressBar != null) {
+                } elseif ($this->downloadProgressBar != null) {
                     // at this point, we're downloading and got a progress bar
 
                     $this->downloadProgressBar->advance($downloadedBytes - $this->bytesInPreviousIteration);
@@ -152,13 +151,13 @@ class EPFDownloader extends Command
                     $this->bytesInPreviousIteration = 0; //
                     $this->downloadProgressBar = new ProgressBar($this->output, $downloadTotal);
                     $this->downloadProgressBar->setFormat('very_verbose');
-                } else if ($this->downloadProgressBar != null && $downloadTotal == $downloadedBytes) {
+                } elseif ($this->downloadProgressBar != null && $downloadTotal == $downloadedBytes) {
                     // there is a progress bar and the download it finished
                         
                     $this->downloadProgressBar->finish();
                     $this->downloadProgressBar->clear();
                     $this->downloadProgressBar = null;
-                } else if ($this->downloadProgressBar != null) {
+                } elseif ($this->downloadProgressBar != null) {
                     // at this point, we're downloading and got a progress bar
 
                     $this->downloadProgressBar->advance($downloadedBytes - $this->bytesInPreviousIteration);
