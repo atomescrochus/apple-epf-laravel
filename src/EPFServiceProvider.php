@@ -14,7 +14,7 @@ class EPFServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->publishes([
                 __DIR__.'/../config/apple-epf.php' => config_path('apple-epf.php'),
-            ], 'config');
+            ], 'epf-config');
 
             if (config('apple-epf.include_artisan_cmd')) {
                 $this->commands([

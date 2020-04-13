@@ -31,6 +31,8 @@ Then you have to install the package' service provider, _unless you are running 
 ]
 ```
 
+Publish (and check!) the config file: `php artisan vendor:publish --tag=epf-config`.
+
 You will *have to* add another connection to your `config/database.php` file, this package will be looking for it. You can of course use the same credential as your main database, but to my experience, since EPF database is pretty huge, it's a good idea to keep things separate, it just make things easier.
 
 Below, you'll find the template of the connection to add. You can see we're using the `.env` file to set the connection infos, if necessary. You will have to add those variables to your own `.env`, don't forget!
