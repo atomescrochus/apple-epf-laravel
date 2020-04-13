@@ -2,6 +2,8 @@
 
 return [
 
+    'feed-version' => env('EPF_VERSION', 3),
+
     /*
      * You can get those values in the email you should have received from Apple
      */
@@ -9,7 +11,7 @@ return [
     'password' => env('EPF_PASSWORD'),
 
     /*
-     * Setting it to false will deactivate any artisan command related to EPF. 
+     * Setting it to false will deactivate any artisan command related to EPF.
      * Useful to not clutter your artisan CLI when you only want to use the models provided
      * by the package.
      */

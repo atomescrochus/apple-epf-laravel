@@ -17,6 +17,7 @@ class EPFCrawler
     private $credentials;
     protected $currentIndexContent;
     protected $currentCrawlerUrl;
+    protected $feed_version;
 
     protected $urlForFullImportFiles;
     protected $urlForIncrementalImportFiles;
@@ -30,11 +31,12 @@ class EPFCrawler
      */
     public function __construct()
     {
+        $this->feed_version = config("apple-epf.feed-version");
         $this->credentials = $this->getCredentials();
         $this->paths = $this->getEPFFilesPaths();
 
-        $this->urlForFullImportFiles = "https://feeds.itunes.apple.com/feeds/epf/v3/full/current/";
-        $this->urlForIncrementalImportFiles = "https://feeds.itunes.apple.com/feeds/epf/v3/full/current/incremental/current/";
+        $this->urlForFullImportFiles = "https://feeds.itunes.apple.com/feeds/epf/v{$this->feed_version}/full/current/";
+        $this->urlForIncrementalImportFiles = "https://feeds.itunes.apple.com/feeds/epf/v{$this->feed_version}/full/current/incremental/current/";
 
         $this->links = collect([
             'full' => $this->getFullImportListOfFiles(),
