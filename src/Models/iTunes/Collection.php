@@ -1,9 +1,9 @@
 <?php
 
-namespace Atomescrochus\EPF\Models\iTunes;
+namespace Appwapp\EPF\Models\iTunes;
 
-use Atomescrochus\EPF\Models\iTunes\Genre;
-use Atomescrochus\EPF\Traits\ExportDate;
+use Appwapp\EPF\Models\iTunes\Genre;
+use Appwapp\EPF\Traits\ExportDate;
 use Illuminate\Database\Eloquent\Model;
 
 class Collection extends Model

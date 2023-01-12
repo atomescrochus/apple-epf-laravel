@@ -1,5 +1,5 @@
 {
-    "name": "atomescrochus/apple-epf-laravel",
+    "name": "appwapp/apple-epf-laravel",
     "description": "Provides models and other tools to use Apple's EPF in Laravel.",
     "keywords": [
         "atomescrochus",
@@ -7,9 +7,15 @@
         "itunes",
         "epf"
     ],
-    "homepage": "https://github.com/atomescrochus/apple-epf-laravel",
+    "homepage": "https://github.com/appwapp/apple-epf-laravel",
     "license": "MIT",
     "authors": [
+        {
+            "name": "Marc Andrew Landles",
+            "email": "malandles@appwapp.com",
+            "homepage": "https://www.appwapp.com",
+            "role": "Lead Developer"
+        },
         {
             "name": "Jean-Philippe Murray",
             "email": "jp@atomescroch.us",
@@ -30,12 +36,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Atomescrochus\\EPF\\": "src"
+            "Appwapp\\EPF\\": "src"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Atomescrochus\\EPF\\Test\\": "tests"
+            "Appwapp\\EPF\\Test\\": "tests"
         }
     },
     "scripts": {
@@ -43,11 +49,11 @@
     },
     "config": {
         "sort-packages": true
-  },
+    },
     "extra": {
         "laravel": {
             "providers": [
-                "Atomescrochus\\EPF\\EPFServiceProvider"
+                "Appwapp\\EPF\\EPFServiceProvider"
             ]
         }
     }

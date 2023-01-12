@@ -1,6 +1,6 @@
 <?php
 
-namespace Atomescrochus\EPF\Models\iTunes;
+namespace Appwapp\EPF\Models\iTunes;
 
 use Illuminate\Database\Eloquent\Model;
 

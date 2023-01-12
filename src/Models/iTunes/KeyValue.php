@@ -1,8 +1,8 @@
 <?php
 
-namespace Atomescrochus\EPF\Models\iTunes;
+namespace Appwapp\EPF\Models\iTunes;
 
-use Atomescrochus\EPF\Traits\ExportDate;
+use Appwapp\EPF\Traits\ExportDate;
 use Illuminate\Database\Eloquent\Model;
 
 class KeyValue extends Model

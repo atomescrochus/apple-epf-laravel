@@ -1,6 +1,6 @@
 <?php
 
-namespace Atomescrochus\EPF\Traits;
+namespace Appwapp\EPF\Traits;
 
 trait FileStorage
 {

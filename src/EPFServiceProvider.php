@@ -1,6 +1,6 @@
 <?php
 
-namespace Atomescrochus\EPF;
+namespace Appwapp\EPF;
 
 use Illuminate\Support\ServiceProvider;
 

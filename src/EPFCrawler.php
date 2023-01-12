@@ -1,9 +1,9 @@
 <?php
 
-namespace Atomescrochus\EPF;
+namespace Appwapp\EPF;
 
-use Atomescrochus\EPF\Traits\FeedCredentials;
-use Atomescrochus\EPF\Traits\FileStorage;
+use Appwapp\EPF\Traits\FeedCredentials;
+use Appwapp\EPF\Traits\FileStorage;
 use Carbon\Carbon;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Storage;

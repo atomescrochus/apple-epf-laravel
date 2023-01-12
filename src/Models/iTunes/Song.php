@@ -1,10 +1,10 @@
 <?php
 
-namespace Atomescrochus\EPF\Models\iTunes;
+namespace Appwapp\EPF\Models\iTunes;
 
-use Atomescrochus\EPF\Models\iTunes\Collection;
-use Atomescrochus\EPF\Models\iTunes\ParentalAdvisory;
-use Atomescrochus\EPF\Traits\ExportDate;
+use Appwapp\EPF\Models\iTunes\Collection;
+use Appwapp\EPF\Models\iTunes\ParentalAdvisory;
+use Appwapp\EPF\Traits\ExportDate;
 use Illuminate\Database\Eloquent\Model;
 
 class Song extends Model

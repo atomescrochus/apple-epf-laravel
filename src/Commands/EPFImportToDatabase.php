@@ -1,10 +1,10 @@
 <?php
 
-namespace Atomescrochus\EPF\Commands;
+namespace Appwapp\EPF\Commands;
 
-use Atomescrochus\EPF\EPFFileImporter;
-use Atomescrochus\EPF\Traits\FeedCredentials;
-use Atomescrochus\EPF\Traits\FileStorage;
+use Appwapp\EPF\EPFFileImporter;
+use Appwapp\EPF\Traits\FeedCredentials;
+use Appwapp\EPF\Traits\FileStorage;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Storage;
 

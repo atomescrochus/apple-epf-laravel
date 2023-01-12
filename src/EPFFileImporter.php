@@ -1,6 +1,6 @@
 <?php
 
-namespace Atomescrochus\EPF;
+namespace Appwapp\EPF;
 
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -38,7 +38,7 @@ class EPFFileImporter
     {
         $start = Carbon::now();
         // fetch the model based on the file name
-        $model = "Atomescrochus\EPF\Models\iTunes\\";
+        $model = "Appwapp\EPF\Models\iTunes\\";
         $model .= studly_case($this->file->getFilename());
 
         $this->file->seek(0);
