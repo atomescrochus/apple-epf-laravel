@@ -1,17 +1,31 @@
 <?php
 
-namespace Appwapp\EPF\Models\iTunes;
+namespace Appwapp\EPF\Models\Itunes;
 
-use Appwapp\EPF\Traits\ExportDate;
-use Illuminate\Database\Eloquent\Model;
-
-class MixType extends Model
+class MixType extends ItunesModel
 {
-    use ExportDate;
-
-    public $timestamps = false;
-    protected $connection = 'apple-epf';
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
     protected $table = 'mix_type';
-    protected $primaryKey = "mix_type_id";
-    protected $fillable = ['export_date', 'mix_type_id', 'name'];
+
+    /**
+     * The primary key associated with the table.
+     *
+     * @var string
+     */
+    protected $primaryKey = 'mix_type_id';
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'export_date',
+        'mix_type_id',
+        'name'
+    ];
 }

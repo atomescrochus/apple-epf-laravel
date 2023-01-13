@@ -1,18 +1,27 @@
 <?php
 
-namespace Appwapp\EPF\Models\iTunes;
+namespace Appwapp\EPF\Models\Itunes;
 
-use Appwapp\EPF\Traits\ExportDate;
-use Illuminate\Database\Eloquent\Model;
-
-class AlbumPopularityPerGenre extends Model
+class AlbumPopularityPerGenre extends ItunesModel
 {
-    use ExportDate;
-    
-    public $timestamps = false;
-    
-    protected $connection = 'apple-epf';
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
     protected $table = 'album_popularity_per_genre';
-    protected $primaryKey = "storefront_id";
+
+    /**
+     * The primary key associated with the table.
+     *
+     * @var string
+     */
+    protected $primaryKey = 'storefront_id';
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
     protected $fillable = ['export_date', 'storefront_id', 'genre_id', 'album_id', 'album_rank'];
 }

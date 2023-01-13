@@ -1,17 +1,31 @@
 <?php
 
-namespace Appwapp\EPF\Models\iTunes;
+namespace Appwapp\EPF\Models\Itunes;
 
-use Appwapp\EPF\Traits\ExportDate;
-use Illuminate\Database\Eloquent\Model;
-
-class TranslationType extends Model
+class TranslationType extends ItunesModel
 {
-    use ExportDate;
-
-    public $timestamps = false;
-    protected $connection = 'apple-epf';
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
     protected $table = 'translation_type';
-    protected $primaryKey = "translation_type_id";
-    protected $fillable = ['export_date', 'translation_type_id', 'name'];
+
+    /**
+     * The primary key associated with the table.
+     *
+     * @var string
+     */
+    protected $primaryKey = 'translation_type_id';
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'export_date',
+        'translation_type_id',
+        'name'
+    ];
 }

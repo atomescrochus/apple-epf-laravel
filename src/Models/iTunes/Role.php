@@ -1,17 +1,31 @@
 <?php
 
-namespace Appwapp\EPF\Models\iTunes;
+namespace Appwapp\EPF\Models\Itunes;
 
-use Appwapp\EPF\Traits\ExportDate;
-use Illuminate\Database\Eloquent\Model;
-
-class Role extends Model
+class Role extends ItunesModel
 {
-    use ExportDate;
-
-    public $timestamps = false;
-    protected $connection = 'apple-epf';
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
     protected $table = 'role';
-    protected $primaryKey = "role_id";
-    protected $fillable = ['export_date', 'role_id', 'name'];
+
+    /**
+     * The primary key associated with the table.
+     *
+     * @var string
+     */
+    protected $primaryKey = 'role_id';
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'export_date',
+        'role_id',
+        'name'
+    ];
 }

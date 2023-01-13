@@ -1,18 +1,33 @@
 <?php
 
-namespace Appwapp\EPF\Models\iTunes;
+namespace Appwapp\EPF\Models\Itunes;
 
-use Appwapp\EPF\Traits\ExportDate;
-use Illuminate\Database\Eloquent\Model;
-
-class ArtistCollection extends Model
+class ArtistCollection extends ItunesModel
 {
-    use ExportDate;
-    
-    public $timestamps = false;
-    
-    protected $connection = 'apple-epf';
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
     protected $table = 'artist_collection';
-    protected $primaryKey = "artist_id";
-    protected $fillable = ['export_date', 'artist_id', 'collection_id', 'is_primary_artist', 'role_id'];
+
+    /**
+     * The primary key associated with the table.
+     *
+     * @var string
+     */
+    protected $primaryKey = 'artist_id';
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'export_date',
+        'artist_id',
+        'collection_id',
+        'is_primary_artist',
+        'role_id'
+    ];
 }

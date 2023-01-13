@@ -1,18 +1,33 @@
 <?php
 
-namespace Appwapp\EPF\Models\iTunes;
+namespace Appwapp\EPF\Models\Itunes;
 
-use Appwapp\EPF\Traits\ExportDate;
-use Illuminate\Database\Eloquent\Model;
-
-class ApplicationPrice extends Model
+class ApplicationPrice extends ITunesModel
 {
-    use ExportDate;
-    
-    public $timestamps = false;
-    
-    protected $connection = 'apple-epf';
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
     protected $table = 'application_price';
-    protected $primaryKey = "storefront_id";
-    protected $fillable = ['export_date', 'application_id', 'retail_price', 'currency_code', 'storefront_id'];
+
+    /**
+     * The primary key associated with the table.
+     *
+     * @var string
+     */
+    protected $primaryKey = 'storefront_id';
+    
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'export_date',
+        'application_id',
+        'retail_price',
+        'currency_code',
+        'storefront_id'
+    ];
 }

@@ -1,18 +1,31 @@
 <?php
 
-namespace Appwapp\EPF\Models\iTunes;
+namespace Appwapp\EPF\Models\Itunes;
 
-use Appwapp\EPF\Traits\ExportDate;
-use Illuminate\Database\Eloquent\Model;
-
-class ApplicationDeviceType extends Model
+class ApplicationDeviceType extends ItunesModel
 {
-    use ExportDate;
-    
-    public $timestamps = false;
-    
-    protected $connection = 'apple-epf';
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
     protected $table = 'application_device_type';
-    protected $primaryKey = "application_id";
-    protected $fillable = ['export_date', 'application_id', 'device_type_id'];
+
+    /**
+     * The primary key associated with the table.
+     *
+     * @var string
+     */
+    protected $primaryKey = 'application_id';
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'export_date',
+        'application_id',
+        'device_type_id'
+    ];
 }
