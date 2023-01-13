@@ -13,8 +13,7 @@ use Symfony\Component\Console\Helper\ProgressBar;
 
 class EPFDownloader extends Command
 {
-    use FileStorage;
-    use FeedCredentials;
+    use FeedCredentials, FileStorage;
 
     /**
      * The name and signature of the console command.

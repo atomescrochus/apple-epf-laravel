@@ -10,8 +10,7 @@ use Illuminate\Support\Facades\Storage;
 
 class EPFExtractor extends Command
 {
-    use FileStorage;
-    use FeedCredentials;
+    use FeedCredentials, FileStorage;
 
     /**
      * The name and signature of the console command.

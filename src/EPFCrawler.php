@@ -11,8 +11,7 @@ use Symfony\Component\DomCrawler\Crawler;
 
 class EPFCrawler
 {
-    use FeedCredentials;
-    use FileStorage;
+    use FeedCredentials, FileStorage;
 
     private $credentials;
     protected $currentIndexContent;
