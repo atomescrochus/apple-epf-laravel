@@ -4,7 +4,7 @@ namespace Appwapp\EPF;
 
 use Appwapp\EPF\Traits\FeedCredentials;
 use Appwapp\EPF\Traits\FileStorage;
-use Carbon\Carbon;
+use Illuminate\Support\Carbon;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\DomCrawler\Crawler;
