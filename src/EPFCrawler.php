@@ -8,48 +8,85 @@ use Illuminate\Support\Carbon;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\DomCrawler\Crawler;
+use Illuminate\Support\Collection;
 
 class EPFCrawler
 {
     use FeedCredentials, FileStorage;
 
-    private $credentials;
+    /**
+     * The index of the current content.
+     *
+     * @var mixed
+     */
     protected $currentIndexContent;
-    protected $currentCrawlerUrl;
-
-    protected $urlForFullImportFiles;
-    protected $urlForIncrementalImportFiles;
-
-    public $links;
-    public $fullImportTime;
-    public $incrementalImportTime;
+    /**
+     * The URL of the current crawled content.
+     *
+     * @var string
+     */
+    protected string $currentCrawlerUrl;
 
     /**
-     * Create a new Skeleton Instance.
+     * URL for the full import.
+     * @var mixed
+     */
+    protected string $urlForFullImportFiles;
+
+    /**
+     * URL for the incremental import.
+     * @var string
+     */
+    protected string $urlForIncrementalImportFiles;
+
+    /**
+     * All the links to crawl for.
+     *
+     * @var Collection
+     */
+    public Collection $links;
+
+    /**
+     * The time of the full import.
+     *
+     * @var Carbon
+     */
+    public Carbon $fullImportTime;
+
+    /**
+     * The time of the incremental import.
+     *
+     * @var Carbon
+     */
+    public Carbon $incrementalImportTime;
+
+    /**
+     * Construct a new instance.
      */
     public function __construct()
     {
-        $this->credentials = $this->getCredentials();
-        $this->paths = $this->getEPFFilesPaths();
-
-        $this->urlForFullImportFiles = "https://feeds.itunes.apple.com/feeds/epf/v3/full/current/";
-        $this->urlForIncrementalImportFiles = "https://feeds.itunes.apple.com/feeds/epf/v3/full/current/incremental/current/";
+        $this->urlForFullImportFiles        = "https://feeds.itunes.apple.com/feeds/epf/v5/current/";
+        $this->urlForIncrementalImportFiles = "https://feeds.itunes.apple.com/feeds/epf/v5/current/incremental/current/";
 
         $this->links = collect([
-            'full' => $this->getFullImportListOfFiles(),
+            'full'        => $this->getFullImportListOfFiles(),
             'incremental' => $this->getIncrementalImportListOfFiles(),
         ]);
 
         $this->currentIndexContent = "";
-        $this->credentials = "";
     }
 
-    private function getFullImportListOfFiles()
+    /**
+     * Gets a full import list of files from the EPF directory.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    private function getFullImportListOfFiles(): Collection
     {
         $this->crawlCurrentFolder(false);
 
         $crawler = new Crawler($this->currentIndexContent, $this->urlForFullImportFiles);
-        $links = collect($crawler->filter('table > tr > td > a')->links());
+        $links   = collect($crawler->filter('table > tr > td > a')->links());
 
         $links =  $links->reject(function ($link) {
             return str_contains($link->getUri(), 'incremental');
@@ -64,7 +101,12 @@ class EPFCrawler
         return $links;
     }
 
-    private function getIncrementalImportListOfFiles()
+    /**
+     * Gets the incremental import list of files from the EPF directory.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    private function getIncrementalImportListOfFiles(): Collection
     {
         $this->crawlCurrentFolder(true);
 
@@ -82,24 +124,42 @@ class EPFCrawler
         return $links;
     }
 
-    private function getDateFromFilename($link)
+    /**
+     * Gets the date from the import filename.
+     *
+     * @param  string $link
+     *
+     * @return Carbon
+     */
+    private function getDateFromFilename(string $link): Carbon
     {
         $filename = basename($link, ".tbz");
         $time = str_replace("itunes", "", $filename);
         return Carbon::parse($time);
     }
 
-    private function crawlCurrentFolder($incremental = false)
+    /**
+     * Crawl the current folder.
+     *
+     * @param bool $incremental
+     *
+     * @return void
+     */
+    private function crawlCurrentFolder(bool $incremental = false): void
     {
+        $paths             = $this->getEPFFilesPaths();
+        $credentials       = $this->getCredentials();
         $currentCrawlerUrl = $incremental ? $this->urlForIncrementalImportFiles : $this->urlForFullImportFiles;
 
-        Storage::put($this->paths->get('storage')->epf_folder."/index.html", "");
+        Storage::put($paths->get('storage')->epf_folder."/index.html", "");
 
         $client = new Client();
-        
-        $client->request('GET', $currentCrawlerUrl, ['auth' => [$this->credentials->login, $this->credentials->password],'sink' => $this->paths->get('system')->epf_folder."/index.html"]);
+        $client->request('GET', $currentCrawlerUrl, [
+            'auth' => [$credentials->login, $credentials->password],
+            'sink' => $paths->get('system')->epf_folder . '/index.html'
+        ]);
 
-        $filePath = $this->paths->get('storage')->epf_folder."/index.html";
+        $filePath = $paths->get('storage')->epf_folder . '/index.html';
         
         $this->currentIndexContent = Storage::get($filePath);
         Storage::delete($filePath);

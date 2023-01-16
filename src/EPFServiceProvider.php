@@ -12,10 +12,12 @@ class EPFServiceProvider extends ServiceProvider
     public function boot()
     {
         if ($this->app->runningInConsole()) {
+            // Publishes the configuration
             $this->publishes([
                 __DIR__.'/../config/apple-epf.php' => config_path('apple-epf.php'),
             ], 'config');
 
+            // Only load commands if included
             if (config('apple-epf.include_artisan_cmd')) {
                 $this->commands([
                     Commands\EPFDownloader::class,
