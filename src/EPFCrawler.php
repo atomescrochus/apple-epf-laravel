@@ -20,6 +20,7 @@ class EPFCrawler
      * @var mixed
      */
     protected $currentIndexContent;
+
     /**
      * The URL of the current crawled content.
      *
