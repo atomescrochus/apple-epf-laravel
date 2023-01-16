@@ -195,20 +195,8 @@ class EPFFileImporter
     private function checkForTable(): void
     {
         $tableName = $this->file->getFilename();
-        $tableExists = Schema::connection($this->connection)->hasTable($tableName);
-
-        if (!$tableExists) {
-            $primaryKeys = implode(",", $this->primaryKeys->toArray());
-            $columns = collect();
-
-            $this->columns->each(function ($type, $name) use ($columns) {
-                $columns->push("{$name} {$type}");
-            });
-
-            $columns = implode(", ", $columns->toArray());
-            $sql = "CREATE TABLE {$tableName} ({$columns}, PRIMARY KEY($primaryKeys));";
-
-            DB::connection($this->connection)->statement($sql);
+        if (! Schema::connection($this->connection)->hasTable($tableName)) {
+            throw new TableNotFoundException("The `{$tableName}` table was not found in the '{$this->connection}' connection. Please run the 'apple-epf-laravel' migrations or adjust the configuration.");
         }
     }
 
