@@ -44,6 +44,13 @@ class EPFCommand extends Command
     protected string $group;
 
     /**
+     * The folder made of group and type.
+     *
+     * @var string
+     */
+    protected string $variableFolders;
+
+    /**
      * Create a new command instance.
      *
      * @return void
@@ -71,7 +78,11 @@ class EPFCommand extends Command
             throw new MissingCommandOptions("The '$optionGroup' group is not supported.");
         }
 
+        // Get the type and group
         $this->type  = $optionType ?? $this->choice('What is the type of files you want to download?', self::SUPPORTED_TYPES, 0);
         $this->group = $optionGroup ?? $this->choice('What is the group of files you want to download?', self::SUPPORTED_GROUPS, 0);
+
+        // Build the varilable folder
+        $this->variableFolders = "{$this->group}/{$this->type}";
     }
 }

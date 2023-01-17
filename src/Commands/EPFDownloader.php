@@ -9,7 +9,7 @@ use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\Console\Helper\ProgressBar;
 
-class EPFDownload extends EPFCommand
+class EPFDownloader extends EPFCommand
 {
     use FeedCredentials, FileStorage;
 
@@ -69,7 +69,7 @@ class EPFDownload extends EPFCommand
      * The progress bar.
      * @var mixed
      */
-    private ?ProgressBar $downloadProgressBar;
+    private $downloadProgressBar;
 
     /**
      * Bytes in the previous progress bar iteration.
@@ -77,13 +77,6 @@ class EPFDownload extends EPFCommand
      * @var int
      */
     private int $bytesInPreviousIteration;
-
-    /**
-     * The folder made of group and type.
-     *
-     * @var string
-     */
-    private string $variableFolders;
 
     /**
      * Create a new command instance.
@@ -107,11 +100,10 @@ class EPFDownload extends EPFCommand
     public function handle()
     {
         $this->line("");
-        $this->line("👋. Welcome to the Apple EPF downloader! 👋");
+        $this->line("👋 Welcome to the Apple EPF downloader! 👋");
 
         // Get the group and type
         $this->gatherUserInput();
-        $this->variableFolders = "{$this->group}/{$this->type}";
 
         if ($this->option('skip-confirm') || $this->confirm("Are you ready to launch the downloads?")) {
             $this->epf = new EPFCrawler();
@@ -171,13 +163,17 @@ class EPFDownload extends EPFCommand
         $client->request('GET', $link, [
             'auth'     => [$this->credentials->login, $this->credentials->password],
             'sink'     => "{$this->paths->get('system')->archive}/{$this->variableFolders}/{$filename}",
-            'progress' => call_user_func([$this, 'progress']),
+            'progress' => function ($downloadTotal, $downloadedBytes) {
+                $this->progress($downloadTotal, $downloadedBytes);
+            },
         ]);
 
         $client->request('GET', $linkMD5, [
             'auth'     => [$this->credentials->login, $this->credentials->password],
             'sink'     => "{$this->paths->get('system')->archive}/{$this->variableFolders}/{$filenameMD5}",
-            'progress' => call_user_func([$this, 'progress']),
+            'progress' => function ($downloadTotal, $downloadedBytes) {
+                $this->progress($downloadTotal, $downloadedBytes);
+            },
         ]);
     }
 
@@ -186,7 +182,6 @@ class EPFDownload extends EPFCommand
      *
      * @param mixed $downloadTotal
      * @param mixed $downloadedBytes
-
      *
      * @return void
      */
