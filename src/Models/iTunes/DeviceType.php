@@ -2,7 +2,9 @@
 
 namespace Appwapp\EPF\Models\Itunes;
 
-class DeviceType extends ItunesModel
+use Appwapp\EPF\Models\EPFModel;
+
+class DeviceType extends EPFModel
 {
     /**
      * The table associated with the model.

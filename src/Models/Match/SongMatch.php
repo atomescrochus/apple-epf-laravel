@@ -1,8 +1,10 @@
 <?php
 
-namespace Appwapp\EPF\Models\Itunes;
+namespace Appwapp\EPF\Models\Match;
 
-class SongMatch extends ItunesModel
+use Appwapp\EPF\Models\EPFModel;
+
+class SongMatch extends EPFModel
 {
     /**
      * The table associated with the model.

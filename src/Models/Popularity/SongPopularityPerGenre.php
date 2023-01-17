@@ -2,21 +2,23 @@
 
 namespace Appwapp\EPF\Models\Itunes;
 
-class VideoMatch extends ItunesModel
+use Appwapp\EPF\Models\EPFModel;
+
+class SongPopularityPerGenre extends EPFModel
 {
     /**
      * The table associated with the model.
      *
      * @var string
      */
-    protected $table = 'video_match';
+    protected $table = 'album_popularity_per_genre';
 
     /**
      * The primary key associated with the table.
      *
      * @var string
      */
-    protected $primaryKey = 'video_id';
+    protected $primaryKey = 'storefront_id';
 
     /**
      * The attributes that are mass assignable.
@@ -25,10 +27,9 @@ class VideoMatch extends ItunesModel
      */
     protected $fillable = [
         'export_date',
-        'video_id',
-        'upc',
-        'isrc',
-        'amg_video_id',
-        'isan'
+        'storefront_id',
+        'genre_id',
+        'song_id',
+        'song_rank'
     ];
 }

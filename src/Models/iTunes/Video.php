@@ -2,7 +2,9 @@
 
 namespace Appwapp\EPF\Models\Itunes;
 
-class Video extends ItunesModel
+use Appwapp\EPF\Models\EPFModel;
+
+class Video extends EPFModel
 {
     /**
      * The table associated with the model.

@@ -2,7 +2,9 @@
 
 namespace Appwapp\EPF\Models\Itunes;
 
-class TranslationType extends ItunesModel
+use Appwapp\EPF\Models\EPFModel;
+
+class TranslationType extends EPFModel
 {
     /**
      * The table associated with the model.

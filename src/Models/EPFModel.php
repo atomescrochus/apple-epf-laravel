@@ -1,11 +1,11 @@
 <?php
 
-namespace Appwapp\EPF\Models\Itunes;
+namespace Appwapp\EPF\Models;
 
 use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
-class ItunesModel extends Model
+class EPFModel extends Model
 {
     /**
      * The database connection that should be used by the model.

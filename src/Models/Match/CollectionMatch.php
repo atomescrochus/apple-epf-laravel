@@ -1,24 +1,24 @@
 <?php
 
-namespace Appwapp\EPF\Models\Itunes;
+namespace Appwapp\EPF\Models\Match;
 
 use Appwapp\EPF\Models\EPFModel;
 
-class GenreApplication extends EPFModel
+class CollectionMatch extends EPFModel
 {
     /**
      * The table associated with the model.
      *
      * @var string
      */
-    protected $table = 'genre_application';
+    protected $table = 'collection_match';
 
     /**
      * The primary key associated with the table.
      *
      * @var string
      */
-    protected $primaryKey = 'genre_id';
+    protected $primaryKey = 'collection_id';
 
     /**
      * The attributes that are mass assignable.
@@ -27,8 +27,9 @@ class GenreApplication extends EPFModel
      */
     protected $fillable = [
         'export_date',
-        'genre_id',
-        'application_id',
-        'is_primary'
+        'collection_id',
+        'upc',
+        'grid',
+        'amg_album_id'
     ];
 }

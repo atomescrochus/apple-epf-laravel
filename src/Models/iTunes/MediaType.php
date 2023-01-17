@@ -2,7 +2,9 @@
 
 namespace Appwapp\EPF\Models\Itunes;
 
-class MediaType extends ItunesModel
+use Appwapp\EPF\Models\EPFModel;
+
+class MediaType extends EPFModel
 {
     /**
      * The table associated with the model.

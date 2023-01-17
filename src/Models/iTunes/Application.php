@@ -2,7 +2,9 @@
 
 namespace Appwapp\EPF\Models\Itunes;
 
-class Application extends ItunesModel
+use Appwapp\EPF\Models\EPFModel;
+
+class Application extends EPFModel
 {
     /**
      * The table associated with the model.

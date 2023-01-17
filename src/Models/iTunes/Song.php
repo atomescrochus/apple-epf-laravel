@@ -2,9 +2,11 @@
 
 namespace Appwapp\EPF\Models\Itunes;
 
+use Appwapp\EPF\Models\EPFModel;
+
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
-class Song extends ItunesModel
+class Song extends EPFModel
 {
     /**
      * The table associated with the model.

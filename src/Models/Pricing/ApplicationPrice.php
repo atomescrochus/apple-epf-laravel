@@ -2,14 +2,16 @@
 
 namespace Appwapp\EPF\Models\Itunes;
 
-class SongPopularityPerGenre extends ItunesModel
+use Appwapp\EPF\Models\EPFModel;
+
+class ApplicationPrice extends EPFModel
 {
     /**
      * The table associated with the model.
      *
      * @var string
      */
-    protected $table = 'song_popularity_per_genre';
+    protected $table = 'application_price';
 
     /**
      * The primary key associated with the table.
@@ -17,7 +19,7 @@ class SongPopularityPerGenre extends ItunesModel
      * @var string
      */
     protected $primaryKey = 'storefront_id';
-
+    
     /**
      * The attributes that are mass assignable.
      *
@@ -25,9 +27,9 @@ class SongPopularityPerGenre extends ItunesModel
      */
     protected $fillable = [
         'export_date',
-        'storefront_id',
-        'genre_id',
-        'song_id',
-        'song_rank'
+        'application_id',
+        'retail_price',
+        'currency_code',
+        'storefront_id'
     ];
 }

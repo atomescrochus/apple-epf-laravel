@@ -2,7 +2,9 @@
 
 namespace Appwapp\EPF\Models\Itunes;
 
-class Role extends ItunesModel
+use Appwapp\EPF\Models\EPFModel;
+
+class Role extends EPFModel
 {
     /**
      * The table associated with the model.

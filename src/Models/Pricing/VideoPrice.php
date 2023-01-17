@@ -2,22 +2,24 @@
 
 namespace Appwapp\EPF\Models\Itunes;
 
-class ApplicationPrice extends ITunesModel
+use Appwapp\EPF\Models\EPFModel;
+
+class VideoPrice extends EPFModel
 {
     /**
      * The table associated with the model.
      *
      * @var string
      */
-    protected $table = 'application_price';
+    protected $table = 'video_price';
 
     /**
      * The primary key associated with the table.
      *
      * @var string
      */
-    protected $primaryKey = 'storefront_id';
-    
+    protected $primaryKey = 'video';
+
     /**
      * The attributes that are mass assignable.
      *
@@ -25,9 +27,15 @@ class ApplicationPrice extends ITunesModel
      */
     protected $fillable = [
         'export_date',
-        'application_id',
+        'video',
         'retail_price',
+        'storefront_id',
         'currency_code',
-        'storefront_id'
+        'availability_date',
+        'sd_price',
+        'hq_price',
+        'lc_rental_price',
+        'sd_rental_price',
+        'hd_rental_price'
     ];
 }

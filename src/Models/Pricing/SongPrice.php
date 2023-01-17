@@ -4,14 +4,14 @@ namespace Appwapp\EPF\Models\Itunes;
 
 use Appwapp\EPF\Models\EPFModel;
 
-class SongTranslation extends EPFModel
+class SongPrice extends EPFModel
 {
     /**
      * The table associated with the model.
      *
      * @var string
      */
-    protected $table = 'song_translation';
+    protected $table = 'song_price';
 
     /**
      * The primary key associated with the table.
@@ -28,18 +28,10 @@ class SongTranslation extends EPFModel
     protected $fillable = [
         'export_date',
         'song_id',
-        'language_code',
-        'is_pronunciation',
-        'translation',
-        'translation_type_id'
-    ];
-
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array
-     */
-    protected $casts = [
-        'is_pronunciation' => 'boolean',
+        'retail_price',
+        'storefront_id',
+        'currency_code',
+        'availability_date',
+        'hq_price'
     ];
 }

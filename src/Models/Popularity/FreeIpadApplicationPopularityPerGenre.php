@@ -2,21 +2,23 @@
 
 namespace Appwapp\EPF\Models\Itunes;
 
-class VideoPrice extends ItunesModel
+use Appwapp\EPF\Models\EPFModel;
+
+class FreeIpadApplicationPopularityPerGenre extends EPFModel
 {
     /**
      * The table associated with the model.
      *
      * @var string
      */
-    protected $table = 'video_price';
+    protected $table = 'free_ipad_application_popularity_per_genre';
 
     /**
      * The primary key associated with the table.
      *
      * @var string
      */
-    protected $primaryKey = 'video';
+    protected $primaryKey = 'storefront_id';
 
     /**
      * The attributes that are mass assignable.
@@ -25,15 +27,9 @@ class VideoPrice extends ItunesModel
      */
     protected $fillable = [
         'export_date',
-        'video',
-        'retail_price',
         'storefront_id',
-        'currency_code',
-        'availability_date',
-        'sd_price',
-        'hq_price',
-        'lc_rental_price',
-        'sd_rental_price',
-        'hd_rental_price'
+        'genre_id',
+        'application_id',
+        'application_rank'
     ];
 }

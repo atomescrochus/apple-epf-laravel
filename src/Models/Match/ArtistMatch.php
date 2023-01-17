@@ -1,22 +1,24 @@
 <?php
 
-namespace Appwapp\EPF\Models\Itunes;
+namespace Appwapp\EPF\Models\Match;
 
-class CollectionMatch extends ItunesModel
+use Appwapp\EPF\Models\EPFModel;
+
+class ArtistMatch extends EPFModel
 {
     /**
      * The table associated with the model.
      *
      * @var string
      */
-    protected $table = 'collection_match';
+    protected $table = 'artist_match';
 
     /**
      * The primary key associated with the table.
      *
      * @var string
      */
-    protected $primaryKey = 'collection_id';
+    protected $primaryKey = 'artist_id';
 
     /**
      * The attributes that are mass assignable.
@@ -25,9 +27,8 @@ class CollectionMatch extends ItunesModel
      */
     protected $fillable = [
         'export_date',
-        'collection_id',
-        'upc',
-        'grid',
-        'amg_album_id'
+        'artist_id',
+        'amg_artist_id',
+        'amg_video_artist_id'
     ];
 }

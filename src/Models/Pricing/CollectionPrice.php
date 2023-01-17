@@ -2,21 +2,23 @@
 
 namespace Appwapp\EPF\Models\Itunes;
 
-class ArtistMatch extends ItunesModel
+use Appwapp\EPF\Models\EPFModel;
+
+class CollectionPrice extends EPFModel
 {
     /**
      * The table associated with the model.
      *
      * @var string
      */
-    protected $table = 'artist_match';
+    protected $table = 'collection_price';
 
     /**
      * The primary key associated with the table.
      *
      * @var string
      */
-    protected $primaryKey = 'artist_id';
+    protected $primaryKey = 'collection_id';
 
     /**
      * The attributes that are mass assignable.
@@ -25,8 +27,11 @@ class ArtistMatch extends ItunesModel
      */
     protected $fillable = [
         'export_date',
-        'artist_id',
-        'amg_artist_id',
-        'amg_video_artist_id'
+        'collection_id',
+        'retail_price',
+        'storefront_id',
+        'currency_code',
+        'availability_date',
+        'hq_price'
     ];
 }

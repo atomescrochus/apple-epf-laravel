@@ -2,9 +2,11 @@
 
 namespace Appwapp\EPF\Models\Itunes;
 
+use Appwapp\EPF\Models\EPFModel;
+
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
-class ParentalAdvisory extends ItunesModel
+class ParentalAdvisory extends EPFModel
 {
     /**
      * The table associated with the model.

@@ -2,7 +2,9 @@
 
 namespace Appwapp\EPF\Models\Itunes;
 
-class KeyValue extends ItunesModel
+use Appwapp\EPF\Models\EPFModel;
+
+class KeyValue extends EPFModel
 {
     /**
      * The table associated with the model.

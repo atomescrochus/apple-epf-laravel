@@ -2,10 +2,9 @@
 
 namespace Appwapp\EPF\Models\Itunes;
 
-use Appwapp\EPF\Traits\ExportDate;
-use Illuminate\Database\Eloquent\Model;
+use Appwapp\EPF\Models\EPFModel;
 
-class CollectionTranslation extends ItunesModel
+class CollectionTranslation extends EPFModel
 {
     /**
      * The table associated with the model.
