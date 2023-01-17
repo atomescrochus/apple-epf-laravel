@@ -2,7 +2,9 @@
 
 namespace Appwapp\EPF\Models\Match;
 
-class VideoMatch extends ItunesModel
+use Appwapp\EPF\Models\EPFModel;
+
+class VideoMatch extends EPFModel
 {
     /**
      * The table associated with the model.

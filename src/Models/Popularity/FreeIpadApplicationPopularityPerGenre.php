@@ -1,6 +1,6 @@
 <?php
 
-namespace Appwapp\EPF\Models\Itunes;
+namespace Appwapp\EPF\Models\Popularity;
 
 use Appwapp\EPF\Models\EPFModel;
 

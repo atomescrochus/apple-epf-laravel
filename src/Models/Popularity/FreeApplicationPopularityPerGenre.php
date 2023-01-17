@@ -1,8 +1,10 @@
 <?php
 
-namespace Appwapp\EPF\Models\Itunes;
+namespace Appwapp\EPF\Models\Popularity;
 
-class ApplicationPopularityPerGenre extends ItunesModel
+use Appwapp\EPF\Models\EPFModel;
+
+class FreeApplicationPopularityPerGenre extends EPFModel
 {
     /**
      * The table associated with the model.
