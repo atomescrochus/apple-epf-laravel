@@ -3,7 +3,6 @@
 namespace Appwapp\EPF;
 
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -68,11 +67,19 @@ class EPFFileImporter
     public int $totalRows;
 
     /**
+     * Group to import to.
+     *
+     * @var string
+     */
+    protected string $group;
+
+    /**
      * Constructs a new instance.
      *
-     * @param string $file The file to import
+     * @param  string  $file  The file to import
+     * @param  string  $group The group to import to
      */
-    public function __construct(string $file)
+    public function __construct(string $file, string $group)
     {
         // Setup the special characters
         $this->specialChars = (object) [
@@ -87,7 +94,8 @@ class EPFFileImporter
         $this->totalRows  = 0;
 
         // Get the file and its relevant information
-        $this->file = new \SplFileObject($file);
+        $this->group = $group;
+        $this->file  = new \SplFileObject($file);
         $this->getRelevantInformationFromFile();
 
         // Make sure the database table exists
@@ -103,9 +111,8 @@ class EPFFileImporter
     {
         $start = Carbon::now();
 
-        // fetch the model based on the file name
-        $model = 'Appwapp\EPF\Models\Itunes\\';
-        $model .= Str::studly($this->file->getFilename());
+        // fetch the model based on the file name and group
+        $model = 'Appwapp\EPF\Models\\'. Str::ucfirst($this->group)  .'\\' . Str::studly($this->file->getFilename());
 
         $this->file->seek(0);
 
@@ -115,8 +122,8 @@ class EPFFileImporter
             if ($line != "" && ! str_contains($line, "#")) {
                 //a.k.a not the last, or a comment
 
-                $line    = str_replace($this->specialChars->rs, "", $line); // remove record separator
-                $values  = explode($this->specialChars->fs, $line); // divide values
+                $line    = str_replace($this->specialChars->record_separator, "", $line); // remove record separator
+                $values  = explode($this->specialChars->field_separator, $line); // divide values
                 $columns = collect($this->columns->keys());
                 $data    = collect();
 
@@ -134,7 +141,6 @@ class EPFFileImporter
                 });
 
                 $primaryKey = [$this->primaryKeys->first() => $data->pull($this->primaryKeys->first())];
-
                 $row        = $model::updateOrCreate(
                     $primaryKey,
                     $data->toArray()
@@ -157,7 +163,7 @@ class EPFFileImporter
     {
         while (! $this->file->eof()) {
             $line = $this->file->fgets(); // get the line
-            $line = str_replace($this->specialChars->rs, "", $line); // remove record separator, we already read line by line anyway
+            $line = str_replace($this->specialChars->record_separator, "", $line); // remove record separator, we already read line by line anyway
 
             if ($this->file->key() == 0) {
                 // first line, column names
@@ -179,7 +185,7 @@ class EPFFileImporter
                 $this->setExportType($line);
             }
 
-            if ($line[0] != $this->specialChars->co) {
+            if ($line[0] != $this->specialChars->comments_delimiter) {
                 break;
             }
         }
@@ -222,7 +228,7 @@ class EPFFileImporter
     private function setPrimaryKey(string $line): void
     {
         $line       = str_replace("#primaryKey:", "", $line); // remove comment character and info
-        $this->primaryKeys = collect(explode($this->specialChars->fs, $line));
+        $this->primaryKeys = collect(explode($this->specialChars->field_separator, $line));
     }
 
     /**
@@ -235,7 +241,7 @@ class EPFFileImporter
     private function setColumnNames(string $line): void
     {
         $line   = substr($line, 1); // remove comment character
-        $this->columns = collect(explode($this->specialChars->fs, $line));
+        $this->columns = collect(explode($this->specialChars->field_separator, $line));
     }
 
     /**
@@ -248,7 +254,7 @@ class EPFFileImporter
     private function setColumnTypes(string $line): void
     {
         $line    = str_replace("#dbTypes:", "", $line); // remove comment character and info
-        $line    = collect(explode($this->specialChars->fs, $line));
+        $line    = collect(explode($this->specialChars->field_separator, $line));
 
         $columns = collect([]);
 
