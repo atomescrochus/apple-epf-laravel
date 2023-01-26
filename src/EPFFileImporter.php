@@ -228,7 +228,7 @@ class EPFFileImporter
         }
 
         // Check if model is included in config
-        if (! in_array($this->model, config('apple_epf.included_models'))) {
+        if (! in_array($this->model, config('apple-epf.included_models'))) {
             return false;
         }
 
