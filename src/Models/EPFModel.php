@@ -40,4 +40,14 @@ class EPFModel extends Model
         // Reduce microseconds to milliseconds
         return Carbon::createFromTimestamp(substr($timestamp, 0, -3));
     }
+
+    /**
+     * Gets the table name statically.
+     *
+     * @return string
+     */
+    public static function getTableName(): string
+    {
+        return with(new static )->getTable();
+    }
 }

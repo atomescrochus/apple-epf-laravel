@@ -53,4 +53,69 @@ return [
     'archive_folder'    => 'archives',
     'extraction_folder' => 'files',
     
+    /*
+    |--------------------------------------------------------------------------
+    | Included in the importation and migrations
+    |--------------------------------------------------------------------------
+    |
+    | If you don't need to import everything from Apple's EPF. This configuration
+    | helps to only migrate the needed tables and to only import the right models.
+    |
+    | To exclude a model AND the migration, comment or remove any of the models below.
+    |
+    */
+    'included_models' => [
+        // Itunes
+        Appwapp\EPF\Models\Itunes\Application::class,
+        Appwapp\EPF\Models\Itunes\ApplicationDetail::class,
+        Appwapp\EPF\Models\Itunes\ApplicationDeviceType::class,
+        Appwapp\EPF\Models\Itunes\Artist::class,
+        Appwapp\EPF\Models\Itunes\ArtistApplication::class,
+        Appwapp\EPF\Models\Itunes\ArtistCollection::class,
+        Appwapp\EPF\Models\Itunes\ArtistSong::class,
+        Appwapp\EPF\Models\Itunes\ArtistTranslation::class,
+        Appwapp\EPF\Models\Itunes\ArtistType::class,
+        Appwapp\EPF\Models\Itunes\ArtistVideo::class,
+        Appwapp\EPF\Models\Itunes\Collection::class,
+        Appwapp\EPF\Models\Itunes\CollectionSong::class,
+        Appwapp\EPF\Models\Itunes\CollectionTranslation::class,
+        Appwapp\EPF\Models\Itunes\CollectionType::class,
+        Appwapp\EPF\Models\Itunes\CollectionVideo::class,
+        Appwapp\EPF\Models\Itunes\DeviceType::class,
+        Appwapp\EPF\Models\Itunes\Genre::class,
+        Appwapp\EPF\Models\Itunes\GenreApplication::class,
+        Appwapp\EPF\Models\Itunes\GenreArtist::class,
+        Appwapp\EPF\Models\Itunes\GenreCollection::class,
+        Appwapp\EPF\Models\Itunes\GenreVideo::class,
+        Appwapp\EPF\Models\Itunes\KeyValue::class,
+        Appwapp\EPF\Models\Itunes\MediaType::class,
+        Appwapp\EPF\Models\Itunes\ParentalAdvisory::class,
+        Appwapp\EPF\Models\Itunes\Role::class,
+        Appwapp\EPF\Models\Itunes\Song::class,
+        Appwapp\EPF\Models\Itunes\SongTranslation::class,
+        Appwapp\EPF\Models\Itunes\Storefront::class,
+        Appwapp\EPF\Models\Itunes\TranslationType::class,
+        Appwapp\EPF\Models\Itunes\Video::class,
+        Appwapp\EPF\Models\Itunes\VideoTranslation::class,
+
+        // Match
+        Appwapp\EPF\Models\Match\ArtistMatch::class,
+        Appwapp\EPF\Models\Match\CollectionMatch::class,
+        Appwapp\EPF\Models\Match\SongMatch::class,
+        Appwapp\EPF\Models\Match\VideoMatch::class,
+
+        // Popularity
+        Appwapp\EPF\Models\Popularity\AlbumPopularityPerGenre::class,
+        Appwapp\EPF\Models\Popularity\FreeApplicationPopularityPerGenre::class,
+        Appwapp\EPF\Models\Popularity\FreeIpadApplicationPopularityPerGenre::class,
+        Appwapp\EPF\Models\Popularity\PaidApplicationPopularityPerGenre::class,
+        Appwapp\EPF\Models\Popularity\PaidIpadApplicationPopularityPerGenre::class,
+        Appwapp\EPF\Models\Popularity\SongPopularityPerGenre::class,
+
+        // Pricing
+        Appwapp\EPF\Models\Pricing\ApplicationPrice::class,
+        Appwapp\EPF\Models\Pricing\CollectionPrice::class,
+        Appwapp\EPF\Models\Pricing\SongPrice::class,
+        Appwapp\EPF\Models\Pricing\VideoPrice::class,
+    ]
 ];

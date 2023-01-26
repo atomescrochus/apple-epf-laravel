@@ -83,7 +83,11 @@ class EPFImportToDatabase extends EPFCommand
             $epfImport = new EPFFileImporter($pathToFile, $this->group);
             $epfImport->startImport();
 
-            $this->comment("Finished this file. I've imported or updated {$epfImport->totalRows} rows in {$epfImport->duration} seconds ⏱");
+            if ($epfImport->skipped) {
+                $this->comment("Skipped this file.");
+            } else {
+                $this->comment("Finished this file. I've imported or updated {$epfImport->totalRows} rows in {$epfImport->duration} seconds ⏱");
+            }
 
             if ($this->confirm("Would you like to deleted the file, now that it's been imported?")) {
                 Storage::delete($this->paths->get('storage')->extraction."/{$this->variableFolders}/{$this->folder}/{$file}");

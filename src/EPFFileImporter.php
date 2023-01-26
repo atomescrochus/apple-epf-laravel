@@ -6,6 +6,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use Appwapp\EPF\Exceptions\ModelNotFoundException;
 use Appwapp\EPF\Exceptions\TableNotFoundException;
 
 class EPFFileImporter
@@ -67,11 +68,25 @@ class EPFFileImporter
     public int $totalRows;
 
     /**
+     * Wether the file was skipped or not.
+     *
+     * @var bool
+     */
+    public bool $skipped = false;
+
+    /**
      * Group to import to.
      *
      * @var string
      */
     protected string $group;
+
+    /**
+     * The model classname
+     *
+     * @var string
+     */
+    protected string $model;
 
     /**
      * Constructs a new instance.
@@ -98,8 +113,8 @@ class EPFFileImporter
         $this->file  = new \SplFileObject($file);
         $this->getRelevantInformationFromFile();
 
-        // Make sure the database table exists
-        $this->checkForTable();
+        // fetch the model based on the file name and group
+        $this->model = 'Appwapp\EPF\Models\\'. Str::studly($this->group)  .'\\' . Str::studly($this->file->getFilename());
     }
 
     /**
@@ -107,12 +122,17 @@ class EPFFileImporter
      *
      * @return void
      */
-    public function startImport()
+    public function startImport(): void
     {
-        $start = Carbon::now();
+        // Verifies the dynamic model and 
+        // checks if it needs to be ignored
+        if ($this->verifyModel() === false) {
+            // Ignore the model, return as done
+            $this->skipped = true;
+            return;
+        }
 
-        // fetch the model based on the file name and group
-        $model = 'Appwapp\EPF\Models\\'. Str::ucfirst($this->group)  .'\\' . Str::studly($this->file->getFilename());
+        $start = Carbon::now();
 
         $this->file->seek(0);
 
@@ -192,18 +212,33 @@ class EPFFileImporter
     }
 
     /**
-     * Checks if the associated table exists.
+     * Verifies if the model exists, if the model should be
+     * included in the import and if the table exists.
      *
+     * @throws ModelNotFoundException
      * @throws TableNotFoundException
      * 
-     * @return void
+     * @return bool
      */
-    private function checkForTable(): void
+    private function verifyModel(): bool
     {
-        $tableName = $this->file->getFilename();
+        // Check if model exists
+        if (! class_exists($this->model)) {
+            throw new ModelNotFoundException("Model '{$this->model}' does not exists. Make sure 'apple-epf-laravel' is up to date.");
+        }
+
+        // Check if model is included in config
+        if (! in_array($this->model, config('apple_epf.included_models'))) {
+            return false;
+        }
+
+        // Make sure the table exists, a.k.a. migrations have been run
+        $tableName = $this->model::getTableName();
         if (! Schema::connection($this->connection)->hasTable($tableName)) {
             throw new TableNotFoundException("The `{$tableName}` table was not found in the '{$this->connection}' connection. Please run the 'apple-epf-laravel' migrations or adjust the configuration.");
         }
+
+        return true;
     }
 
     /**

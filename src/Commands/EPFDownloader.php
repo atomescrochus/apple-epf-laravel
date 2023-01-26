@@ -3,10 +3,12 @@
 namespace Appwapp\EPF\Commands;
 
 use Appwapp\EPF\EPFCrawler;
+use Appwapp\EPF\Exceptions\ModelNotFoundException;
 use Appwapp\EPF\Traits\FeedCredentials;
 use Appwapp\EPF\Traits\FileStorage;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Symfony\Component\Console\Helper\ProgressBar;
 
 class EPFDownloader extends EPFCommand
@@ -130,9 +132,21 @@ class EPFDownloader extends EPFCommand
         $this->info("There is a total of $countLinks files to download.");
 
         $links->each(function ($link) {
-            $filename = basename($link);
-
             $this->line("");
+            $filename = basename($link);           
+
+            // fetch the model based on the file name and group
+            $model = 'Appwapp\EPF\Models\\'. Str::studly($this->group)  .'\\' . Str::studly(Str::replace('.tbz', '', $filename));
+            if (! class_exists($model)) {
+                throw new ModelNotFoundException("Model '$model' does not exists. Make sure 'apple-epf-laravel' is up to date.");
+            }
+
+            // Check if we need to skip that file/model
+            if (! in_array($model, config('apple-epf.included_models'))) {
+                $this->comment("Skipped download of {$filename}");
+                return;
+            }
+
             $this->line("Starting download of {$filename}...");
 
             $this->download($link);

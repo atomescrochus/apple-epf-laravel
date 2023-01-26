@@ -4,14 +4,14 @@ namespace Appwapp\EPF\Models\Itunes;
 
 use Appwapp\EPF\Models\EPFModel;
 
-class ArtistType extends EPFModel
+class ArtistVideo extends EPFModel
 {
     /**
      * The table associated with the model.
      *
      * @var string
      */
-    protected $table = 'artist_type';
+    protected $table = 'artist_video';
 
     /**
      * The primary key associated with the table.
@@ -27,7 +27,9 @@ class ArtistType extends EPFModel
      */
     protected $fillable = [
         'export_date',
-        'name',
-        'primary_media_type_id'
+        'artist_id',
+        'video_id',
+        'is_primary_artist',
+        'role_id'
     ];
 }
