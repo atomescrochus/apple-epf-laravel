@@ -18,6 +18,8 @@ class EPFImportToDatabase extends EPFCommand
     protected $signature = 'epf:import
         {--type= : the type of import, either "full", or "incremental"}
         {--group= : the group of import, either "itunes", "match", "popularity" or "pricing"}
+        {--folder= : the folder name to import from, ex: "itunes20230115"}
+        {--file= : the file to import or "all"}
         {--skip-confirm : skip the confirmation prompt}';
 
     /**
@@ -113,7 +115,7 @@ class EPFImportToDatabase extends EPFCommand
             exit;
         }
 
-        $this->folder = $this->choice('Of which folder do you wish to start the import?', $folderChoice, 0);
+        $this->folder = $this->option('folder') ?? $this->choice('Of which folder do you wish to start the import?', $folderChoice, 0);
     }
 
     /**
@@ -134,7 +136,7 @@ class EPFImportToDatabase extends EPFCommand
 
         $extractChoices = array_merge(['all'], $listOfFiles);
 
-        $toExtract = $this->choice('Which file do you want to extract?', $extractChoices, 0);
+        $toExtract = $this->option('file') ?? $this->choice('Which file do you want to extract?', $extractChoices, 0);
 
         $this->toExtract = $toExtract == "all" ? $listOfFiles : $toExtract;
         $this->toExtract = collect($this->toExtract);
