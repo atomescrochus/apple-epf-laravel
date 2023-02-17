@@ -2,6 +2,6 @@
 
 namespace Appwapp\EPF\Exceptions;
 
-class ModelNotFoundException extends \Exception
+class ModelNotFoundException extends AppleEpfLaravelException
 {
 }

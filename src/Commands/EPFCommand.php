@@ -2,7 +2,7 @@
 
 namespace Appwapp\EPF\Commands;
 
-use Appwapp\EPF\Exceptions\MissingCommandOptions;
+use Appwapp\EPF\Exceptions\MissingCommandOptionsException;
 use Illuminate\Console\Command;
 
 class EPFCommand extends Command
@@ -71,11 +71,11 @@ class EPFCommand extends Command
         $optionGroup = $this->option('group');
 
         if ($optionType !== null && ! in_array($optionType, self::SUPPORTED_TYPES)) {
-            throw new MissingCommandOptions("The '$optionType' type is not supported.");
+            throw new MissingCommandOptionsException("The '$optionType' type is not supported.");
         }
 
         if ($optionGroup !== null && ! in_array($optionGroup, self::SUPPORTED_GROUPS)) {
-            throw new MissingCommandOptions("The '$optionGroup' group is not supported.");
+            throw new MissingCommandOptionsException("The '$optionGroup' group is not supported.");
         }
 
         // Get the type and group
