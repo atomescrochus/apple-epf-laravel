@@ -2,34 +2,15 @@
 
 namespace Appwapp\EPF\Models\Popularity;
 
-use Appwapp\EPF\Models\EPFModel;
-
-class PaidApplicationPopularityPerGenre extends EPFModel
+class PaidApplicationPopularityPerGenre extends ApplicationPopularityPerGenre
 {
     /**
-     * The table associated with the model.
+     * Sets the application_type attribute
      *
-     * @var string
+     * @return void
      */
-    protected $table = 'paid_application_popularity_per_genre';
-
-    /**
-     * The primary key associated with the table.
-     *
-     * @var string
-     */
-    protected $primaryKey = 'storefront_id';
-
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
-    protected $fillable = [
-        'export_date',
-        'storefront_id',
-        'genre_id',
-        'application_id',
-        'application_rank'
-    ];
+    public function setApplicationTypeAttribute()
+    {
+        $this->attributes['application_type'] = 'paid';
+    }
 }
