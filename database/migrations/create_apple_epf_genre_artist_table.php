@@ -14,9 +14,10 @@ class CreateAppleEpfGenreArtistTable extends Migration
     public function up()
     {
         Schema::connection(config('apple-epf.database_connection'))->create('genre_artist', function (Blueprint $table) {
+            $table->primary(['genre_id', 'artist_id']);
             $table->timestamp('export_date');
-            $table->unsignedBigInteger('genre_id')->primary();
-            $table->unsignedBigInteger('artist_id')->primary();
+            $table->unsignedBigInteger('genre_id');
+            $table->unsignedBigInteger('artist_id');
             $table->boolean('is_primary_genre');
         });
     }

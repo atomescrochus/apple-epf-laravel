@@ -14,9 +14,10 @@ class CreateAppleEpfApplicationDetailTable extends Migration
     public function up()
     {
         Schema::connection(config('apple-epf.database_connection'))->create('application_detail', function (Blueprint $table) {
+            $table->primary(['application_id', 'language_code']);
             $table->timestamp('export_date');
-            $table->unsignedBigInteger('application_id')->primary();
-            $table->string('language_code', 2)->primary();
+            $table->unsignedBigInteger('application_id');
+            $table->string('language_code', 2);
             $table->string('title');
             $table->text('description');
             $table->text('release_notes');

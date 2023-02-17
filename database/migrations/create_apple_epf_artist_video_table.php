@@ -14,9 +14,10 @@ class CreateAppleEpfArtistVideoTable extends Migration
     public function up()
     {
         Schema::connection(config('apple-epf.database_connection'))->create('artist_video', function (Blueprint $table) {
+            $table->primary(['artist_id', 'video_id']);
             $table->timestamp('export_date');
-            $table->unsignedBigInteger('artist_id')->primary();
-            $table->unsignedBigInteger('video_id')->primary();
+            $table->unsignedBigInteger('artist_id');
+            $table->unsignedBigInteger('video_id');
             $table->boolean('is_primary_artist');
             $table->unsignedBigInteger('role_id');
         });

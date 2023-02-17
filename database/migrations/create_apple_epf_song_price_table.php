@@ -14,10 +14,11 @@ class CreateAppleEpfSongPriceTable extends Migration
     public function up()
     {
         Schema::connection(config('apple-epf.database_connection'))->create('song_price', function (Blueprint $table) {
+            $table->primary(['song_id', 'storefront_id']);
             $table->timestamp('export_date');
-            $table->unsignedBigInteger('song_id')->primary();
+            $table->unsignedBigInteger('song_id');
             $table->decimal('retail_price');
-            $table->unsignedBigInteger('storefront_id')->primary();
+            $table->unsignedBigInteger('storefront_id');
             $table->string('currency_code', 3);
             $table->dateTime('availability_date', 3);
             $table->decimal('hq_price');

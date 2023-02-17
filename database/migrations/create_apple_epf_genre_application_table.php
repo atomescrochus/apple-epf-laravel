@@ -14,9 +14,10 @@ class CreateAppleEpfGenreApplicationTable extends Migration
     public function up()
     {
         Schema::connection(config('apple-epf.database_connection'))->create('genre_application', function (Blueprint $table) {
+            $table->primary(['genre_id', 'application_id']);
             $table->timestamp('export_date');
-            $table->unsignedBigInteger('genre_id')->primary();
-            $table->unsignedBigInteger('application_id')->primary();
+            $table->unsignedBigInteger('genre_id');
+            $table->unsignedBigInteger('application_id');
             $table->boolean('is_primary');
         });
     }

@@ -14,9 +14,10 @@ class CreateAppleEpfCollectionVideoTable extends Migration
     public function up()
     {
         Schema::connection(config('apple-epf.database_connection'))->create('collection_video', function (Blueprint $table) {
+            $table->primary(['collection_id', 'video_id']);
             $table->timestamp('export_date');
-            $table->unsignedBigInteger('collection_id')->primary();
-            $table->unsignedBigInteger('video_id')->primary();
+            $table->unsignedBigInteger('collection_id');
+            $table->unsignedBigInteger('video_id');
             $table->tinyInteger('track_number');
             $table->tinyInteger('volume_number');
             $table->boolean('preorder_only');
