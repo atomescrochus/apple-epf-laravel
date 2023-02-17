@@ -19,6 +19,7 @@ class CreateAppleEpfApplicationPopularityPerGenreTable extends Migration
             $table->unsignedBigInteger('genre_id')->primary();
             $table->unsignedBigInteger('application_id')->primary();
             $table->unsignedBigInteger('application_rank');
+            $table->string('application_type');
         });
     }
 
