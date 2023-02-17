@@ -3,9 +3,12 @@
 namespace Appwapp\EPF\Models\Itunes;
 
 use Appwapp\EPF\Models\EPFModel;
+use Appwapp\EPF\Traits\HasCompositePrimaryKey;
 
 class ArtistCollection extends EPFModel
 {
+    use HasCompositePrimaryKey;
+
     /**
      * The table associated with the model.
      *
@@ -16,9 +19,12 @@ class ArtistCollection extends EPFModel
     /**
      * The primary key associated with the table.
      *
-     * @var string
+     * @var array
      */
-    protected $primaryKey = 'artist_id';
+    protected $primaryKey = [
+        'artist_id',
+        'collection_id'
+    ];
 
     /**
      * The attributes that are mass assignable.
@@ -31,5 +37,14 @@ class ArtistCollection extends EPFModel
         'collection_id',
         'is_primary_artist',
         'role_id'
+    ];
+
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'is_primary_artist' => 'boolean',
     ];
 }

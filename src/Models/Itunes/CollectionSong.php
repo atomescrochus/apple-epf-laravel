@@ -3,9 +3,12 @@
 namespace Appwapp\EPF\Models\Itunes;
 
 use Appwapp\EPF\Models\EPFModel;
+use Appwapp\EPF\Traits\HasCompositePrimaryKey;
 
 class CollectionSong extends EPFModel
 {
+    use HasCompositePrimaryKey;
+
     /**
      * The table associated with the model.
      *
@@ -16,9 +19,12 @@ class CollectionSong extends EPFModel
     /**
      * The primary key associated with the table.
      *
-     * @var string
+     * @var array
      */
-    protected $primaryKey = 'collection_id';
+    protected $primaryKey = [
+        'collection_id',
+        'song_id'
+    ];
 
     /**
      * The attributes that are mass assignable.
@@ -33,5 +39,14 @@ class CollectionSong extends EPFModel
         'track_number',
         'volume_number',
         'preorder_only'
+    ];
+
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'preorder_only' => 'boolean',
     ];
 }

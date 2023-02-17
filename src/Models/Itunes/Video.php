@@ -3,9 +3,12 @@
 namespace Appwapp\EPF\Models\Itunes;
 
 use Appwapp\EPF\Models\EPFModel;
+use Appwapp\EPF\Traits\HasSearchTerms;
 
 class Video extends EPFModel
 {
+    use HasSearchTerms;
+
     /**
      * The table associated with the model.
      *

@@ -7,6 +7,15 @@ use Appwapp\EPF\Models\EPFModel;
 class KeyValue extends EPFModel
 {
     /**
+     * Key constants.
+     *
+     * @var string
+     */
+    public const
+        KEY_EXPORT_VERSION        = 'exportVersion',
+        KEY_LAST_FULL_EXPORT_DATE = 'lastFullExportDate';
+
+    /**
      * The table associated with the model.
      *
      * @var string
@@ -18,7 +27,7 @@ class KeyValue extends EPFModel
      *
      * @var string
      */
-    protected $primaryKey = 'genre_id';
+    protected $primaryKey = 'key_';
 
     /**
      * The attributes that are mass assignable.

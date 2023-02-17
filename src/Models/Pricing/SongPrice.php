@@ -3,9 +3,12 @@
 namespace Appwapp\EPF\Models\Pricing;
 
 use Appwapp\EPF\Models\EPFModel;
+use Appwapp\EPF\Traits\HasCompositePrimaryKey;
 
 class SongPrice extends EPFModel
 {
+    use HasCompositePrimaryKey;
+
     /**
      * The table associated with the model.
      *
@@ -18,7 +21,10 @@ class SongPrice extends EPFModel
      *
      * @var string
      */
-    protected $primaryKey = 'song_id';
+    protected $primaryKey = [
+        'song_id',
+        'storefront_id'
+    ];
 
     /**
      * The attributes that are mass assignable.

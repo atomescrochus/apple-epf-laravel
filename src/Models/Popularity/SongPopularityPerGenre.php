@@ -3,22 +3,29 @@
 namespace Appwapp\EPF\Models\Popularity;
 
 use Appwapp\EPF\Models\EPFModel;
+use Appwapp\EPF\Traits\HasCompositePrimaryKey;
 
 class SongPopularityPerGenre extends EPFModel
 {
+    use HasCompositePrimaryKey;
+
     /**
      * The table associated with the model.
      *
      * @var string
      */
-    protected $table = 'album_popularity_per_genre';
+    protected $table = 'song_popularity_per_genre';
 
     /**
      * The primary key associated with the table.
      *
      * @var string
      */
-    protected $primaryKey = 'storefront_id';
+    protected $primaryKey = [
+        'storefront_id',
+        'genre_id',
+        'song_id'
+    ];
 
     /**
      * The attributes that are mass assignable.

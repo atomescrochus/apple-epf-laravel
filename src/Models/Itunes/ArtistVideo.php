@@ -3,9 +3,12 @@
 namespace Appwapp\EPF\Models\Itunes;
 
 use Appwapp\EPF\Models\EPFModel;
+use Appwapp\EPF\Traits\HasCompositePrimaryKey;
 
 class ArtistVideo extends EPFModel
 {
+    use HasCompositePrimaryKey;
+
     /**
      * The table associated with the model.
      *
@@ -16,9 +19,12 @@ class ArtistVideo extends EPFModel
     /**
      * The primary key associated with the table.
      *
-     * @var string
+     * @var array
      */
-    protected $primaryKey = 'artist_type_id';
+    protected $primaryKey = [
+        'artist_id',
+        'video_id'
+    ];
 
     /**
      * The attributes that are mass assignable.
@@ -31,5 +37,14 @@ class ArtistVideo extends EPFModel
         'video_id',
         'is_primary_artist',
         'role_id'
+    ];
+
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'is_primary_artist' => 'boolean',
     ];
 }

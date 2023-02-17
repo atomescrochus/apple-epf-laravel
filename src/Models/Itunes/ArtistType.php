@@ -27,6 +27,7 @@ class ArtistType extends EPFModel
      */
     protected $fillable = [
         'export_date',
+        'artist_type_id',
         'name',
         'primary_media_type_id'
     ];

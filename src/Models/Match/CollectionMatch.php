@@ -29,7 +29,6 @@ class CollectionMatch extends EPFModel
         'export_date',
         'collection_id',
         'upc',
-        'grid',
         'amg_album_id'
     ];
 }

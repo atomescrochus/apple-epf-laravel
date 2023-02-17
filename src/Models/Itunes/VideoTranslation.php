@@ -3,9 +3,12 @@
 namespace Appwapp\EPF\Models\Itunes;
 
 use Appwapp\EPF\Models\EPFModel;
+use Appwapp\EPF\Traits\HasCompositePrimaryKey;
 
 class VideoTranslation extends EPFModel
 {
+    use HasCompositePrimaryKey;
+
     /**
      * The table associated with the model.
      *
@@ -18,7 +21,12 @@ class VideoTranslation extends EPFModel
      *
      * @var string
      */
-    protected $primaryKey = 'video_id';
+    protected $primaryKey = [
+        'video_id',
+        'language_code',
+        'is_pronunciation',
+        'translation_type_id'
+    ];
 
     /**
      * The attributes that are mass assignable.

@@ -3,9 +3,12 @@
 namespace Appwapp\EPF\Models\Pricing;
 
 use Appwapp\EPF\Models\EPFModel;
+use Appwapp\EPF\Traits\HasCompositePrimaryKey;
 
 class CollectionPrice extends EPFModel
 {
+    use HasCompositePrimaryKey;
+
     /**
      * The table associated with the model.
      *
@@ -18,7 +21,10 @@ class CollectionPrice extends EPFModel
      *
      * @var string
      */
-    protected $primaryKey = 'collection_id';
+    protected $primaryKey = [
+        'collection_id',
+        'storefront_id'
+    ];
 
     /**
      * The attributes that are mass assignable.
