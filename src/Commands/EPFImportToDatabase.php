@@ -20,7 +20,8 @@ class EPFImportToDatabase extends EPFCommand
         {--group= : the group of import, either "itunes", "match", "popularity" or "pricing"}
         {--folder= : the folder name to import from, ex: "itunes20230115"}
         {--file= : the file to import or "all"}
-        {--skip-confirm : skip the confirmation prompt}';
+        {--skip-confirm : skip the confirmation prompt}
+        {--delete : deletes the file once imported}';
 
     /**
      * The console command description.
@@ -91,7 +92,7 @@ class EPFImportToDatabase extends EPFCommand
                 $this->comment("Finished this file. I've imported or updated {$epfImport->totalRows} rows in {$epfImport->duration} seconds ⏱");
             }
 
-            if ($this->confirm("Would you like to deleted the file, now that it's been imported?")) {
+            if ($this->option('delete') ?? $this->confirm("Would you like to deleted the file, now that it's been imported?")) {
                 Storage::delete($this->paths->get('storage')->extraction."/{$this->variableFolders}/{$this->folder}/{$file}");
             }
         });

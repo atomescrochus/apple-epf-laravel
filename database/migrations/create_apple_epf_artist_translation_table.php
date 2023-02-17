@@ -15,11 +15,11 @@ class CreateAppleEpfArtistTranslationTable extends Migration
     {
         Schema::connection(config('apple-epf.database_connection'))->create('artist_translation', function (Blueprint $table) {
             $table->primary(['artist_id', 'language_code', 'is_pronunciation', 'translation_type_id']);
-            $table->timestamp('export_date');
+            $table->unsignedInteger('export_date');
             $table->unsignedBigInteger('artist_id');
             $table->string('language_code', 2);
             $table->boolean('is_pronunciation');
-            $table->string('translation');
+            $table->string('translation', 1000);
             $table->unsignedBigInteger('translation_type_id');
         });
     }

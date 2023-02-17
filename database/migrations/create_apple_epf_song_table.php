@@ -14,21 +14,21 @@ class CreateAppleEpfSongTable extends Migration
     public function up()
     {
         Schema::connection(config('apple-epf.database_connection'))->create('song', function (Blueprint $table) {
-            $table->timestamp('export_date');
+            $table->unsignedInteger('export_date');
             $table->unsignedBigInteger('song_id')->primary();
-            $table->string('name');
-            $table->string('title_version');
-            $table->string('search_terms');
+            $table->string('name', 1000);
+            $table->string('title_version', 1000);
+            $table->string('search_terms', 1000)->nullable();
             $table->unsignedBigInteger('parental_advisory_id');
-            $table->string('artist_display_name')->nullable();
-            $table->string('collection_display_name')->nullable();
-            $table->string('view_url');
+            $table->string('artist_display_name', 1000)->nullable();
+            $table->string('collection_display_name', 1000)->nullable();
+            $table->string('view_url', 1000);
             $table->dateTime('original_release_date');
             $table->dateTime('itunes_release_date');
             $table->unsignedBigInteger('track_length');
-            $table->string('copyright')->nullable();
-            $table->string('p_line')->nullable();
-            $table->string('preview_url');
+            $table->string('copyright', 1000)->nullable();
+            $table->string('p_line', 1000)->nullable();
+            $table->string('preview_url', 1000);
             $table->unsignedBigInteger('preview_length');
         });
     }

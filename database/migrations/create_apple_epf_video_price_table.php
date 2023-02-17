@@ -15,7 +15,7 @@ class CreateAppleEpfVideoPriceTable extends Migration
     {
         Schema::connection(config('apple-epf.database_connection'))->create('video_price', function (Blueprint $table) {
             $table->primary(['video_id', 'storefront_id']);
-            $table->timestamp('export_date');
+            $table->unsignedInteger('export_date');
             $table->unsignedBigInteger('video_id');
             $table->decimal('retail_price')->nullable();
             $table->unsignedBigInteger('storefront_id');

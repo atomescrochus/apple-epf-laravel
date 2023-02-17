@@ -14,10 +14,10 @@ class CreateAppleEpfGenreTable extends Migration
     public function up()
     {
         Schema::connection(config('apple-epf.database_connection'))->create('genre', function (Blueprint $table) {
-            $table->timestamp('export_date');
+            $table->unsignedInteger('export_date');
             $table->unsignedBigInteger('genre_id')->primary();
             $table->unsignedBigInteger('parent_id');
-            $table->string('name');
+            $table->string('name', 1000);
         });
     }
 

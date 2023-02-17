@@ -15,12 +15,12 @@ class CreateAppleEpfApplicationPopularityPerGenreTable extends Migration
     {
         Schema::connection(config('apple-epf.database_connection'))->create('application_popularity_per_genre', function (Blueprint $table) {
             $table->primary(['storefront_id', 'genre_id', 'application_id']);
-            $table->timestamp('export_date');
+            $table->unsignedInteger('export_date');
             $table->unsignedBigInteger('storefront_id');
             $table->unsignedBigInteger('genre_id');
             $table->unsignedBigInteger('application_id');
             $table->unsignedBigInteger('application_rank');
-            $table->string('application_type');
+            $table->string('application_type', 1000);
         });
     }
 

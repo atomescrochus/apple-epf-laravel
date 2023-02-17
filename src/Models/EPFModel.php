@@ -8,13 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 class EPFModel extends Model
 {
     /**
-     * The database connection that should be used by the model.
-     *
-     * @var string
-     */
-    protected $connection = 'apple-epf';
-
-    /**
      * Indicates if the model's ID is auto-incrementing.
      *
      * @var bool
@@ -27,7 +20,19 @@ class EPFModel extends Model
      * @var bool
      */
     public $timestamps = false;
+    
+    /**
+     * Constructs a new instance.
+     *
+     * @param  array  $attributes
+     */
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
 
+        // Set the configuration from the config
+        $this->setConnection(config('apple-epf.database_connection'));
+    }
     /**
      * Get the export_date attribute
      *

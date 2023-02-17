@@ -14,10 +14,10 @@ class CreateAppleEpfStorefrontTable extends Migration
     public function up()
     {
         Schema::connection(config('apple-epf.database_connection'))->create('storefront', function (Blueprint $table) {
-            $table->timestamp('export_date');
+            $table->unsignedInteger('export_date');
             $table->unsignedBigInteger('storefront_id')->primary();
             $table->string('country_code', 3);
-            $table->string('name');
+            $table->string('name', 1000);
         });
     }
 

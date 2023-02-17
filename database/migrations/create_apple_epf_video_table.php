@@ -14,25 +14,25 @@ class CreateAppleEpfVideoTable extends Migration
     public function up()
     {
         Schema::connection(config('apple-epf.database_connection'))->create('video', function (Blueprint $table) {
-            $table->timestamp('export_date');
+            $table->unsignedInteger('export_date');
             $table->unsignedBigInteger('video_id')->primary();
-            $table->string('name');
-            $table->string('title_version');
-            $table->string('search_terms')->nullable();
+            $table->string('name', 1000);
+            $table->string('title_version', 1000);
+            $table->string('search_terms', 1000)->nullable();
             $table->unsignedBigInteger('parental_advisory_id');
-            $table->string('artist_display_name')->nullable();
-            $table->string('collection_display_name')->nullable();
-            $table->string('media_type');
-            $table->string('view_url');
-            $table->string('artwork_url');
+            $table->string('artist_display_name', 1000)->nullable();
+            $table->string('collection_display_name', 1000)->nullable();
+            $table->string('media_type', 1000);
+            $table->string('view_url', 1000);
+            $table->string('artwork_url', 1000);
             $table->dateTime('original_release_date');
             $table->dateTime('itunes_release_date');
-            $table->string('studio_name');
-            $table->string('network_name');
-            $table->string('content_provider');
+            $table->string('studio_name', 1000);
+            $table->string('network_name', 1000);
+            $table->string('content_provider', 1000);
             $table->unsignedBigInteger('track_length');
-            $table->string('copyright')->nullable();
-            $table->string('p_line')->nullable();
+            $table->string('copyright', 1000)->nullable();
+            $table->string('p_line', 1000)->nullable();
             $table->text('short_description');
             $table->text('long_description');
             $table->unsignedInteger('episode_production_number');

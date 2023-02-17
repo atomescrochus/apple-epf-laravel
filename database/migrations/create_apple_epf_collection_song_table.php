@@ -15,7 +15,7 @@ class CreateAppleEpfCollectionSongTable extends Migration
     {
         Schema::connection(config('apple-epf.database_connection'))->create('collection_song', function (Blueprint $table) {
             $table->primary(['collection_id', 'song_id']);
-            $table->timestamp('export_date');
+            $table->unsignedInteger('export_date');
             $table->unsignedBigInteger('collection_id');
             $table->unsignedBigInteger('song_id');
             $table->tinyInteger('track_number');

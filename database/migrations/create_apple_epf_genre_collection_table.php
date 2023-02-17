@@ -15,7 +15,7 @@ class CreateAppleEpfGenreCollectionTable extends Migration
     {
         Schema::connection(config('apple-epf.database_connection'))->create('genre_collection', function (Blueprint $table) {
             $table->primary(['genre_id', 'collection_id']);
-            $table->timestamp('export_date');
+            $table->unsignedInteger('export_date');
             $table->unsignedBigInteger('genre_id');
             $table->unsignedBigInteger('collection_id');
             $table->boolean('is_primary_collection');

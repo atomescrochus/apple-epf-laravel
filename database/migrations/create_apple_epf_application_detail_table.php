@@ -15,22 +15,22 @@ class CreateAppleEpfApplicationDetailTable extends Migration
     {
         Schema::connection(config('apple-epf.database_connection'))->create('application_detail', function (Blueprint $table) {
             $table->primary(['application_id', 'language_code']);
-            $table->timestamp('export_date');
+            $table->unsignedInteger('export_date');
             $table->unsignedBigInteger('application_id');
             $table->string('language_code', 2);
-            $table->string('title');
+            $table->string('title', 1000);
             $table->text('description');
             $table->text('release_notes');
-            $table->string('company_url');
-            $table->string('suppport_url');
-            $table->string('screenshot_url_1');
-            $table->string('screenshot_url_2');
-            $table->string('screenshot_url_3');
-            $table->string('screenshot_url_4');
-            $table->string('screenshot_width_height_1');
-            $table->string('screenshot_width_height_2');
-            $table->string('screenshot_width_height_3');
-            $table->string('screenshot_width_height_4');
+            $table->string('company_url', 1000);
+            $table->string('suppport_url', 1000);
+            $table->string('screenshot_url_1', 1000);
+            $table->string('screenshot_url_2', 1000);
+            $table->string('screenshot_url_3', 1000);
+            $table->string('screenshot_url_4', 1000);
+            $table->string('screenshot_width_height_1', 1000);
+            $table->string('screenshot_width_height_2', 1000);
+            $table->string('screenshot_width_height_3', 1000);
+            $table->string('screenshot_width_height_4', 1000);
         });
     }
 

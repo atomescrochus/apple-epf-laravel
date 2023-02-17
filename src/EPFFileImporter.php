@@ -108,10 +108,9 @@ class EPFFileImporter
         $this->connection = config('apple-epf.database_connection');
         $this->totalRows  = 0;
 
-        // Get the file and its relevant information
+        // Get the file
         $this->group = $group;
         $this->file  = new \SplFileObject($file);
-        $this->getRelevantInformationFromFile();
 
         // fetch the model based on the file name and group
         $this->model = 'Appwapp\EPF\Models\\'. Str::studly($this->group)  .'\\' . Str::studly($this->file->getFilename());
@@ -124,6 +123,9 @@ class EPFFileImporter
      */
     public function startImport(): void
     {
+        // Get the file relevant information
+        $this->getRelevantInformationFromFile();
+
         // Verifies the dynamic model and 
         // checks if it needs to be ignored
         if ($this->verifyModel() === false) {
@@ -152,7 +154,7 @@ class EPFFileImporter
                     $data->put($name, $value);
                 });
 
-                $data       = $data->map(function ($item, $key) {
+                $data = $data->map(function ($item, $key) {
                     if (str_contains($key, "release_date")) {
                         $item = str_replace(' ', '-', $item); // format correctly for mysql date time
                     }
@@ -160,11 +162,13 @@ class EPFFileImporter
                     return $item;
                 });
 
-                $primaryKey = [$this->primaryKeys->first() => $data->pull($this->primaryKeys->first())];
-                $row        = $model::updateOrCreate(
-                    $primaryKey,
-                    $data->toArray()
-                );
+                // Generate the composite or single primary key
+                $primaryKeys = [];
+                foreach($this->primaryKeys->all() as $primaryKey) {
+                    $primaryKeys[$primaryKey] = $data->pull($primaryKey);
+                }
+
+                $this->model::updateOrCreate($primaryKeys, $data->toArray());
 
                 $this->totalRows++;
             }
@@ -185,22 +189,22 @@ class EPFFileImporter
             $line = $this->file->fgets(); // get the line
             $line = str_replace($this->specialChars->record_separator, "", $line); // remove record separator, we already read line by line anyway
 
-            if ($this->file->key() == 0) {
+            if ($this->file->key() == 1) {
                 // first line, column names
                 $this->setColumnNames($line);
             }
 
-            if ($this->file->key() == 1) {
+            if ($this->file->key() == 2) {
                 // second line, primary key
                 $this->setPrimaryKey($line);
             }
 
-            if ($this->file->key() == 2) {
+            if ($this->file->key() == 3) {
                 // third line, columns types
                 $this->setColumnTypes($line);
             }
 
-            if ($this->file->key() == 3) {
+            if ($this->file->key() == 4) {
                 // fourth line, export type
                 $this->setExportType($line);
             }

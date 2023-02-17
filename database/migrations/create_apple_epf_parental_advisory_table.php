@@ -14,9 +14,9 @@ class CreateAppleEpfParentalAdvisoryTable extends Migration
     public function up()
     {
         Schema::connection(config('apple-epf.database_connection'))->create('parental_advisory', function (Blueprint $table) {
-            $table->timestamp('export_date');
+            $table->unsignedInteger('export_date');
             $table->unsignedBigInteger('parental_advisory_id')->primary();
-            $table->string('name');
+            $table->string('name', 1000);
         });
     }
 

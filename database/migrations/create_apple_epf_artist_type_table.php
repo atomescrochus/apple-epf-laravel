@@ -14,9 +14,9 @@ class CreateAppleEpfArtistTypeTable extends Migration
     public function up()
     {
         Schema::connection(config('apple-epf.database_connection'))->create('artist_type', function (Blueprint $table) {
-            $table->timestamp('export_date');
+            $table->unsignedInteger('export_date');
             $table->unsignedBigInteger('artist_type_id')->primary();
-            $table->string('name');
+            $table->string('name', 1000);
             $table->unsignedBigInteger('primary_media_type_id');
         });
     }

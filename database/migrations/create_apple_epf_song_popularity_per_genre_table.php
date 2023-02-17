@@ -15,7 +15,7 @@ class CreateAppleEpfSongPopularityPerGenreTable extends Migration
     {
         Schema::connection(config('apple-epf.database_connection'))->create('song_popularity_per_genre', function (Blueprint $table) {
             $table->primary(['storefron_id', 'genre_id', 'song_id']);
-            $table->timestamp('export_date');
+            $table->unsignedInteger('export_date');
             $table->unsignedBigInteger('storefront_id');
             $table->unsignedBigInteger('genre_id');
             $table->unsignedBigInteger('song_id');

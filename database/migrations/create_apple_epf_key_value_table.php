@@ -14,9 +14,9 @@ class CreateAppleEpfKeyValueTable extends Migration
     public function up()
     {
         Schema::connection(config('apple-epf.database_connection'))->create('key_value', function (Blueprint $table) {
-            $table->timestamp('export_date');
-            $table->string('key_')->primary();
-            $table->string('value_');
+            $table->unsignedInteger('export_date');
+            $table->string('key_', 1000)->primary();
+            $table->string('value_', 1000);
         });
     }
 

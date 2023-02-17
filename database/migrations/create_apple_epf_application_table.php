@@ -14,22 +14,22 @@ class CreateAppleEpfApplicationTable extends Migration
     public function up()
     {
         Schema::connection(config('apple-epf.database_connection'))->create('application', function (Blueprint $table) {
-            $table->timestamp('export_date');
+            $table->unsignedInteger('export_date');
             $table->unsignedBigInteger('application_id')->primary();
-            $table->string('title');
+            $table->string('title', 1000);
             $table->string('recommended_age', 3);
-            $table->string('artist_name');
-            $table->string('seller_name');
-            $table->string('company_url');
-            $table->string('support_url');
-            $table->string('view_url');
-            $table->string('artwork_url_large');
-            $table->string('artwork_url_small');
+            $table->string('artist_name', 1000);
+            $table->string('seller_name', 1000);
+            $table->string('company_url', 1000);
+            $table->string('support_url', 1000);
+            $table->string('view_url', 1000);
+            $table->string('artwork_url_large', 1000);
+            $table->string('artwork_url_small', 1000);
             $table->dateTime('itunes_release_date');
-            $table->string('copyright')->nullable();
+            $table->string('copyright', 1000)->nullable();
             $table->text('description');
-            $table->string('version');
-            $table->string('itunes_version');
+            $table->string('version', 1000);
+            $table->string('itunes_version', 1000);
             $table->unsignedBigInteger('download_size');
         });
     }

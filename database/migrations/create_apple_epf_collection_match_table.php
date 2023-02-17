@@ -14,9 +14,9 @@ class CreateAppleEpfCollectionMatchTable extends Migration
     public function up()
     {
         Schema::connection(config('apple-epf.database_connection'))->create('collection_match', function (Blueprint $table) {
-            $table->timestamp('export_date');
+            $table->unsignedInteger('export_date');
             $table->unsignedBigInteger('collection_id')->primary();
-            $table->string('upc');
+            $table->string('upc', 1000);
             $table->unsignedBigInteger('amg_album_id');
         });
     }

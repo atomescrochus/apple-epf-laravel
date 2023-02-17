@@ -15,7 +15,7 @@ class CreateAppleEpfApplicationDeviceTypeTable extends Migration
     {
         Schema::connection(config('apple-epf.database_connection'))->create('application_device_type', function (Blueprint $table) {
             $table->primary(['application_id', 'device_type_id']);
-            $table->timestamp('export_date');
+            $table->unsignedInteger('export_date');
             $table->unsignedBigInteger('application_id');
             $table->unsignedBigInteger('device_type_id');            
         });

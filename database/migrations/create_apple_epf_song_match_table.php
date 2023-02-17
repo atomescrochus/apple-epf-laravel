@@ -14,9 +14,9 @@ class CreateAppleEpfSongMatchTable extends Migration
     public function up()
     {
         Schema::connection(config('apple-epf.database_connection'))->create('song_match', function (Blueprint $table) {
-            $table->timestamp('export_date');
+            $table->unsignedInteger('export_date');
             $table->unsignedBigInteger('song_id')->primary();
-            $table->string('isrc');
+            $table->string('isrc', 1000);
             $table->unsignedBigInteger('amg_track_id');
         });
     }
