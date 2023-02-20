@@ -3,9 +3,11 @@
 namespace Appwapp\EPF;
 
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use Illuminate\Database\QueryException;
 use Appwapp\EPF\Exceptions\ModelNotFoundException;
 use Appwapp\EPF\Exceptions\TableNotFoundException;
 
@@ -16,7 +18,7 @@ class EPFFileImporter
      *
      * @var SplFileObject
      */
-    protected \SplFileObject $file;
+    protected ?\SplFileObject $file;
 
     /**
      * The connection name.
@@ -138,11 +140,27 @@ class EPFFileImporter
 
         $this->file->seek(0);
 
-        while (! $this->file->eof()) {
-            $line = $this->file->fgets();
+        // Begin the database transaction
+        DB::connection($this->connection)->beginTransaction();
 
-            if ($line != "" && ! str_contains($line, "#")) {
-                //a.k.a not the last, or a comment
+        try {
+            while (! $this->file->eof()) {               
+                $line = $this->file->fgets();
+
+                // Skips end of file or comments
+                if ($line === "" || str_contains($line, "#")) {
+                    continue;
+                }
+
+                // Read line until a record separator is found
+                // Can happen if a value contains a line feed \n
+                if (strpos($line, $this->specialChars->record_separator) === false) {
+                    // Append the next line, verify end of file in case of file corruption
+                    while (strpos($line, $this->specialChars->record_separator) === false && ! $this->file->eof()) {
+                        $line  = str_replace("\n", '', $line);
+                        $line .= $this->file->fgets();
+                    }
+                }
 
                 $line    = str_replace($this->specialChars->record_separator, "", $line); // remove record separator
                 $values  = explode($this->specialChars->field_separator, $line); // divide values
@@ -150,8 +168,7 @@ class EPFFileImporter
                 $data    = collect();
 
                 $columns->each(function ($name, $key) use ($data, $values) {
-                    $value = empty($values[$key]) ? null : $values[$key];
-                    $data->put($name, $value);
+                    $data->put($name, $values[$key] !== '' ? $values[$key] : null);
                 });
 
                 $data = $data->map(function ($item, $key) {
@@ -164,7 +181,7 @@ class EPFFileImporter
 
                 // Generate the composite or single primary key
                 $primaryKeys = [];
-                foreach($this->primaryKeys->all() as $primaryKey) {
+                foreach ($this->primaryKeys->all() as $primaryKey) {
                     $primaryKeys[$primaryKey] = $data->pull($primaryKey);
                 }
 
@@ -172,7 +189,13 @@ class EPFFileImporter
 
                 $this->totalRows++;
             }
+        } catch (QueryException $exception) {
+            DB::connection($this->connection)->rollBack();
+            throw $exception;
         }
+
+        // Commit the transaction
+        DB::connection($this->connection)->commit();
 
         $this->file     = null;
         $this->duration = $start->diffinSeconds(Carbon::now());
