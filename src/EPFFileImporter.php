@@ -114,8 +114,11 @@ class EPFFileImporter
         $this->group = $group;
         $this->file  = new \SplFileObject($file);
 
-        // fetch the model based on the file name and group
+        // Fetch the model based on the file name and group
         $this->model = 'Appwapp\EPF\Models\\'. Str::studly($this->group)  .'\\' . Str::studly($this->file->getFilename());
+
+        // Remove any number in case of multiple files per model
+        $this->model = preg_replace('/[0-9]*/', '', $this->model);
     }
 
     /**

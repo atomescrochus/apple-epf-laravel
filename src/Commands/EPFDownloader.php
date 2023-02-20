@@ -135,8 +135,13 @@ class EPFDownloader extends EPFCommand
             $this->line("");
             $filename = basename($link);           
 
-            // fetch the model based on the file name and group
+            // Fetch the model based on the file name and group
             $model = 'Appwapp\EPF\Models\\'. Str::studly($this->group)  .'\\' . Str::studly(Str::replace('.tbz', '', $filename));
+
+            // Remove any number, in case of multiple files for same model
+            $model = preg_replace('/[0-9]*/', '', $model);
+
+            // If model does not exist, throw an error
             if (! class_exists($model)) {
                 throw new ModelNotFoundException("Model '$model' does not exists. Make sure 'apple-epf-laravel' is up to date.");
             }
