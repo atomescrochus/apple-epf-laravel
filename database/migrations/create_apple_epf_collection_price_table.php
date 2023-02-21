@@ -14,7 +14,7 @@ class CreateAppleEpfCollectionPriceTable extends Migration
     public function up()
     {
         Schema::connection(config('apple-epf.database_connection'))->create('collection_price', function (Blueprint $table) {
-            $table->primary(['collection_id', 'storefront_id']);
+            $table->primary(['collection_id', 'storefront_id'], 'collection_price_primary');
             $table->unsignedInteger('export_date');
             $table->unsignedBigInteger('collection_id');
             $table->unsignedDecimal('retail_price')->nullable();

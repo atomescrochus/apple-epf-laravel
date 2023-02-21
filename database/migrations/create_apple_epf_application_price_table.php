@@ -14,7 +14,7 @@ class CreateAppleEpfApplicationPriceTable extends Migration
     public function up()
     {
         Schema::connection(config('apple-epf.database_connection'))->create('application_price', function (Blueprint $table) {
-            $table->primary(['application_id', 'storefront_id']);
+            $table->primary(['application_id', 'storefront_id'], 'application_price_primary');
             $table->unsignedInteger('export_date');
             $table->unsignedBigInteger('application_id');
             $table->unsignedDecimal('retail_price')->nullable();

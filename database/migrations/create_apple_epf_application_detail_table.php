@@ -14,23 +14,22 @@ class CreateAppleEpfApplicationDetailTable extends Migration
     public function up()
     {
         Schema::connection(config('apple-epf.database_connection'))->create('application_detail', function (Blueprint $table) {
-            $table->primary(['application_id', 'language_code']);
             $table->unsignedInteger('export_date');
-            $table->unsignedBigInteger('application_id');
+            $table->unsignedBigInteger('application_id')->primary();
             $table->string('language_code', 2);
             $table->string('title', 1000);
-            $table->text('description');
-            $table->text('release_notes');
-            $table->string('company_url', 1000);
-            $table->string('suppport_url', 1000);
-            $table->string('screenshot_url_1', 1000);
-            $table->string('screenshot_url_2', 1000);
-            $table->string('screenshot_url_3', 1000);
-            $table->string('screenshot_url_4', 1000);
-            $table->string('screenshot_width_height_1', 1000);
-            $table->string('screenshot_width_height_2', 1000);
-            $table->string('screenshot_width_height_3', 1000);
-            $table->string('screenshot_width_height_4', 1000);
+            $table->longText('description');
+            $table->longText('release_notes')->nullable();
+            $table->string('company_url', 1000)->nullable();
+            $table->string('suppport_url', 1000)->nullable();
+            $table->string('screenshot_url_1', 1000)->nullable();
+            $table->string('screenshot_url_2', 1000)->nullable();
+            $table->string('screenshot_url_3', 1000)->nullable();
+            $table->string('screenshot_url_4', 1000)->nullable();
+            $table->string('screenshot_width_height_1', 20)->nullable();
+            $table->string('screenshot_width_height_2', 20)->nullable();
+            $table->string('screenshot_width_height_3', 20)->nullable();
+            $table->string('screenshot_width_height_4', 20)->nullable();
         });
     }
 

@@ -20,17 +20,17 @@ class CreateAppleEpfApplicationTable extends Migration
             $table->string('recommended_age', 3);
             $table->string('artist_name', 1000);
             $table->string('seller_name', 1000);
-            $table->string('company_url', 1000);
-            $table->string('support_url', 1000);
+            $table->string('company_url', 1000)->nullable();
+            $table->string('support_url', 1000)->nullable();
             $table->string('view_url', 1000);
             $table->string('artwork_url_large', 1000);
             $table->string('artwork_url_small', 1000);
             $table->dateTime('itunes_release_date');
-            $table->string('copyright', 1000)->nullable();
-            $table->text('description');
+            $table->string('copyright', 4000)->nullable();
+            $table->longText('description');
             $table->string('version', 1000);
             $table->string('itunes_version', 1000);
-            $table->unsignedBigInteger('download_size');
+            $table->unsignedBigInteger('download_size')->nullable();
         });
     }
 

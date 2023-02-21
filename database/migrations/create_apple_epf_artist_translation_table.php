@@ -14,7 +14,7 @@ class CreateAppleEpfArtistTranslationTable extends Migration
     public function up()
     {
         Schema::connection(config('apple-epf.database_connection'))->create('artist_translation', function (Blueprint $table) {
-            $table->primary(['artist_id', 'language_code', 'is_pronunciation', 'translation_type_id']);
+            $table->primary(['artist_id', 'language_code', 'is_pronunciation', 'translation_type_id'], 'artist_translation_primary');
             $table->unsignedInteger('export_date');
             $table->unsignedBigInteger('artist_id');
             $table->string('language_code', 2);

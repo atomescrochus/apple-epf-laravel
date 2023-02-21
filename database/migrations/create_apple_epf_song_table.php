@@ -17,7 +17,7 @@ class CreateAppleEpfSongTable extends Migration
             $table->unsignedInteger('export_date');
             $table->unsignedBigInteger('song_id')->primary();
             $table->string('name', 1000);
-            $table->string('title_version', 1000);
+            $table->string('title_version', 1000)->nullable();
             $table->string('search_terms', 1000)->nullable();
             $table->unsignedBigInteger('parental_advisory_id');
             $table->string('artist_display_name', 1000)->nullable();
@@ -28,7 +28,7 @@ class CreateAppleEpfSongTable extends Migration
             $table->unsignedBigInteger('track_length');
             $table->string('copyright', 1000)->nullable();
             $table->string('p_line', 1000)->nullable();
-            $table->string('preview_url', 1000);
+            $table->string('preview_url', 1000)->nullable();
             $table->unsignedBigInteger('preview_length');
         });
     }

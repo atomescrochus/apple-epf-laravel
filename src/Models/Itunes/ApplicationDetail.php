@@ -34,6 +34,7 @@ class ApplicationDetail extends EPFModel
     protected $fillable = [
         'export_date',
         'application_id',
+        'language_code',
         'title',
         'description',
         'release_notes',

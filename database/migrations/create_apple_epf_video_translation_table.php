@@ -14,7 +14,7 @@ class CreateAppleEpfVideoTranslationTable extends Migration
     public function up()
     {
         Schema::connection(config('apple-epf.database_connection'))->create('video_translation', function (Blueprint $table) {
-            $table->primary(['video_id', 'language_code', 'is_pronunciation', 'translation_type_id']);
+            $table->primary(['video_id', 'language_code', 'is_pronunciation', 'translation_type_id'], 'video_translation_primary');
             $table->unsignedInteger('export_date');
             $table->unsignedBigInteger('video_id');
             $table->string('language_code', 2);

@@ -14,7 +14,7 @@ class CreateAppleEpfCollectionTranslationTable extends Migration
     public function up()
     {
         Schema::connection(config('apple-epf.database_connection'))->create('collection_translation', function (Blueprint $table) {
-            $table->primary(['collection_id', 'language_code', 'is_pronunciation', 'translation_type_id']);
+            $table->primary(['collection_id', 'language_code', 'is_pronunciation', 'translation_type_id'], 'collection_translation_primary');
             $table->unsignedInteger('export_date');
             $table->unsignedBigInteger('collection_id');
             $table->string('language_code', 2);

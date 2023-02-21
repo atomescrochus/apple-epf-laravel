@@ -14,7 +14,7 @@ class CreateAppleEpfArtistCollectionTable extends Migration
     public function up()
     {
         Schema::connection(config('apple-epf.database_connection'))->create('artist_collection', function (Blueprint $table) {
-            $table->primary(['artist_id', 'collection_id']);
+            $table->primary(['artist_id', 'collection_id', 'role_id'], 'artist_collection_primary');
             $table->unsignedInteger('export_date');
             $table->unsignedBigInteger('artist_id');
             $table->unsignedBigInteger('collection_id');
