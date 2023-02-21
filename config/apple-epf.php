@@ -28,6 +28,53 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Database import by chunks
+    |--------------------------------------------------------------------------
+    |
+    | Each database has its own limits in terms of maximum size we are able
+    | to insert all at once. Since this packages uses transactions for the whole
+    | importation. It will commit the transactions multiple times by chunks in
+    | order to insert faster and to not hit that limit.
+    |
+    | If you don't know what you are doing, don't change this.
+    |
+    */
+
+    'database_importation_chunks' => env('EPF_DATABASE_IMPORT_BY_CHUNKS', 500),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Named queue
+    |--------------------------------------------------------------------------
+    |
+    | Which queue connection to use to import. Defaults to 'default'.
+    |
+    */
+
+    'queue' => env('EPF_QUEUE', 'default'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Chain jobs
+    |--------------------------------------------------------------------------
+    |
+    | Wether to chain the jobs or not. This package uses jobs for each download,
+    | extract and import. If this is set to true, the next jobs will dispatch
+    | themselves.
+    |
+    | Ex:
+    |   1. DownloadJob for file application.tbz is done, go to next
+    |   2. ExtractJob for file application.tbz is done, go to next
+    |   3. ImportJob for file application is done
+    |
+    | By default set to false for full control.
+    |
+    */
+
+    'chain_jobs' => env('EPF_CHAIN_JOBS', false),
+
+    /*
+    |--------------------------------------------------------------------------
     | Artisan commands
     |--------------------------------------------------------------------------
     |

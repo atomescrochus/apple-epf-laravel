@@ -2,7 +2,7 @@
 
 namespace Appwapp\EPF\Commands;
 
-use Alchemy\Zippy\Zippy;
+use Appwapp\EPF\Jobs\ExtractJob;
 use Appwapp\EPF\Traits\FileStorage;
 use Illuminate\Support\Facades\Storage;
 
@@ -73,37 +73,33 @@ class EPFExtractor extends EPFCommand
         }
     }
 
-    public function startTasks($toExtract)
+    /**
+     * Start the extraction tasks.
+     * 
+     * @param array $toExtract
+     *
+     * @return void
+     */
+    public function startTasks(array $toExtract)
     {
         // Create the extraction directory
-        Storage::makeDirectory($this->paths->get('storage')->extraction."/{$this->variableFolders}");
+        Storage::makeDirectory($this->paths->get('storage')->extraction . "/{$this->variableFolders}");
 
-        $this->startExtractionProcess($toExtract);
-    }
-
-    public function startExtractionProcess($toExtract)
-    {
         $toExtract = collect($toExtract);
 
         $toExtract = $toExtract->map(function ($file) {
-            return $this->paths->get('system')->storage.$file;
+            return $this->paths->get('system')->storage . $file;
         });
 
         $toExtract->each(function ($file) {
             $filename = basename($file);
-
-            $this->line("");
-            $this->line("Extracting {$filename}...");
-
-            $extractor = Zippy::load();
-            $archive   = $extractor->open($file, '.tar.bz2');
-            $archive->extract($this->paths->get('system')->extraction."/{$this->variableFolders}");
-            $this->info("Extraction of {$filename} completed.");
-
-            if ($this->option('delete') !== null || $this->confirm("Do you wish to delete the archive?")) {
-                Storage::delete($this->paths->get('storage')->archive."/{$this->variableFolders}/{$filename}");
-                $this->info("{$filename} deleted.");
-            }
+            $this->line("Dispatching extraction of $filename...");
+            ExtractJob::dispatch(
+                $file,
+                $this->group,
+                $this->type,
+                $this->option('delete') !== null || $this->confirm("Do you wish to delete the archive?")
+            )->onQueue(config('apple-epf.queue'));
         });
     }
 }

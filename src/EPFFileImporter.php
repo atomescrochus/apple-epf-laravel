@@ -28,6 +28,13 @@ class EPFFileImporter
     protected string $connection;
 
     /**
+     * The number of chunks to cut the transaction.
+     *
+     * @var int
+     */
+    protected int $chunks;
+
+    /**
      * The special characters used in EPF feeds.
      *
      * @var object
@@ -108,6 +115,7 @@ class EPFFileImporter
 
         // Get the connection from the configuration
         $this->connection = config('apple-epf.database_connection');
+        $this->chunks     = config('apple-epf.database_importation_chunks');
         $this->totalRows  = 0;
 
         // Get the file
@@ -151,18 +159,14 @@ class EPFFileImporter
                 $line = $this->file->fgets();
 
                 // Skips end of file or comments
-                if ($line === "" || str_contains($line, "#")) {
+                if ($line === "" || str_starts_with($line, "#")) {
                     continue;
                 }
 
                 // Read line until a record separator is found
                 // Can happen if a value contains a line feed \n
-                if (strpos($line, $this->specialChars->record_separator) === false) {
-                    // Append the next line, verify end of file in case of file corruption
-                    while (strpos($line, $this->specialChars->record_separator) === false && ! $this->file->eof()) {
-                        $line  = str_replace("\n", '', $line);
-                        $line .= $this->file->fgets();
-                    }
+                while (strpos($line, $this->specialChars->record_separator) === false && ! $this->file->eof()) {
+                    $line .= $this->file->fgets();
                 }
 
                 $line    = str_replace($this->specialChars->record_separator, "", $line); // remove record separator
@@ -188,21 +192,27 @@ class EPFFileImporter
                     $primaryKeys[$primaryKey] = $data->pull($primaryKey);
                 }
 
+                // Either update or create via the model
                 $this->model::updateOrCreate($primaryKeys, $data->toArray());
-
                 $this->totalRows++;
+
+                // Commit the transaction by chunks
+                // To not go over the database insert limit if any
+                if ($this->totalRows % $this->chunks === 0) { 
+                    DB::connection($this->connection)->commit();
+                }
             }
+
+            // Do a last commit after the loop to commit the remainder
+            DB::connection($this->connection)->commit();
         } catch (QueryException $exception) {
             DB::connection($this->connection)->rollBack();
             throw $exception;
         }
 
-        // Commit the transaction
-        DB::connection($this->connection)->commit();
-
         $this->file     = null;
         $this->duration = $start->diffinSeconds(Carbon::now());
-    }
+    }   
 
     /**
      * Gets the relevant information from the file.

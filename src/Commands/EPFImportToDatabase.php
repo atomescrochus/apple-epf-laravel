@@ -2,7 +2,7 @@
 
 namespace Appwapp\EPF\Commands;
 
-use Appwapp\EPF\EPFFileImporter;
+use Appwapp\EPF\Jobs\ImportJob;
 use Appwapp\EPF\Traits\FileStorage;
 use Illuminate\Support\Facades\Storage;
 
@@ -80,21 +80,14 @@ class EPFImportToDatabase extends EPFCommand
     public function startTasks()
     {
         $this->toExtract->each(function ($file) {
-            $this->info("Starting to processing {$file}");
+            $this->info("Dispatching importation of {$file}");
             $pathToFile = $this->paths->get('system')->extraction."/{$this->variableFolders}/{$this->folder}/{$file}";
-
-            $epfImport = new EPFFileImporter($pathToFile, $this->group);
-            $epfImport->startImport();
-
-            if ($epfImport->skipped) {
-                $this->comment("Skipped this file.");
-            } else {
-                $this->comment("Finished this file. I've imported or updated {$epfImport->totalRows} rows in {$epfImport->duration} seconds ⏱");
-            }
-
-            if ($this->option('delete') ?? $this->confirm("Would you like to deleted the file, now that it's been imported?")) {
-                Storage::delete($this->paths->get('storage')->extraction."/{$this->variableFolders}/{$this->folder}/{$file}");
-            }
+            ImportJob::dispatch(
+                $pathToFile,
+                $this->group,
+                $this->type,
+                $this->option('delete') ?? $this->confirm("Would you like to deleted the file, now that it's been imported?")
+            )->onQueue(config('apple-epf.queue'));
         });
     }
 
