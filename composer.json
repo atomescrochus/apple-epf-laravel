@@ -1,5 +1,6 @@
 {
-    "name": "atomescrochus/apple-epf-laravel",
+    "name": "appwapp/apple-epf-laravel",
+    "version": "0.4",
     "description": "Provides models and other tools to use Apple's EPF in Laravel.",
     "keywords": [
         "atomescrochus",
@@ -7,9 +8,15 @@
         "itunes",
         "epf"
     ],
-    "homepage": "https://github.com/atomescrochus/apple-epf-laravel",
+    "homepage": "https://github.com/appwapp/apple-epf-laravel",
     "license": "MIT",
     "authors": [
+        {
+            "name": "Marc Andrew Landles",
+            "email": "malandles@appwapp.com",
+            "homepage": "https://www.appwapp.com",
+            "role": "Lead Developer"
+        },
         {
             "name": "Jean-Philippe Murray",
             "email": "jp@atomescroch.us",
@@ -18,36 +25,39 @@
         }
     ],
     "require": {
-        "php": "^7.0",
-        "symfony/dom-crawler": "^3.2",
-        "symfony/process": "^3.2",
-        "guzzlehttp/guzzle": "~6.0",
-        "nesbot/carbon": "~1.20",
-        "alchemy/zippy": " ~0.1"
+        "php": "^8.0",
+        "alchemy/zippy": "^1.0",
+        "guzzlehttp/guzzle": "^7.5",
+        "illuminate/support": "^8.0",
+        "symfony/dom-crawler": "^6.2",
+        "symfony/process": "^5.0"
     },
     "require-dev": {
         "phpunit/phpunit": "5.*"
     },
     "autoload": {
         "psr-4": {
-            "Atomescrochus\\EPF\\": "src"
+            "Appwapp\\EPF\\": "src"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Atomescrochus\\EPF\\Test\\": "tests"
+            "Appwapp\\EPF\\Test\\": "tests"
         }
     },
     "scripts": {
         "test": "vendor/bin/phpunit"
     },
     "config": {
-        "sort-packages": true
-  },
+        "sort-packages": true,
+        "allow-plugins": {
+            "kylekatarnls/update-helper": true
+        }
+    },
     "extra": {
         "laravel": {
             "providers": [
-                "Atomescrochus\\EPF\\EPFServiceProvider"
+                "Appwapp\\EPF\\EPFServiceProvider"
             ]
         }
     }

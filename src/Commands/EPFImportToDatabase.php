@@ -1,24 +1,27 @@
 <?php
 
-namespace Atomescrochus\EPF\Commands;
+namespace Appwapp\EPF\Commands;
 
-use Atomescrochus\EPF\EPFFileImporter;
-use Atomescrochus\EPF\Traits\FeedCredentials;
-use Atomescrochus\EPF\Traits\FileStorage;
-use Illuminate\Console\Command;
+use Appwapp\EPF\Jobs\ImportJob;
+use Appwapp\EPF\Traits\FileStorage;
 use Illuminate\Support\Facades\Storage;
 
-class EPFImportToDatabase extends Command
+class EPFImportToDatabase extends EPFCommand
 {
     use FileStorage;
-    use FeedCredentials;
 
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'epf:import';
+    protected $signature = 'epf:import
+        {--type= : the type of import, either "full", or "incremental"}
+        {--group= : the group of import, either "itunes", "match", "popularity" or "pricing"}
+        {--folder= : the folder name to import from, ex: "itunes20230115"}
+        {--file= : the file to import or "all"}
+        {--skip-confirm : skip the confirmation prompt}
+        {--delete : deletes the file once imported}';
 
     /**
      * The console command description.
@@ -27,14 +30,26 @@ class EPFImportToDatabase extends Command
      */
     protected $description = 'This will help import data from files downloaded, then extracted, to database.';
 
-    private $credentials;
+    /**
+     * The paths.
+     *
+     * @var object
+     */
     private $paths;
 
-    private $type;
-    private $group;
+    /**
+     * The folder to import from.
+     *
+     * @var string
+     */
     private $folder;
+
+    /**
+     * The files to extract from.
+     *
+     * @var array
+     */
     private $toExtract;
-    private $variableFolders;
 
     /**
      * Create a new command instance.
@@ -45,7 +60,6 @@ class EPFImportToDatabase extends Command
     {
         parent::__construct();
 
-        $this->credentials = $this->getCredentials();
         $this->paths = $this->getEPFFilesPaths();
     }
 
@@ -59,67 +73,80 @@ class EPFImportToDatabase extends Command
         $this->line("");
         $this->line("👋. Welcome to the Apple EPF importer! 👋");
 
-        $this->type = $this->choice('What is the type of files you want to import?', ['full', 'incremental'], 0);
-        $this->group = $this->choice('What is the group of files you want to import?', ['itunes', 'match', 'popularity', 'pricing'], 0);
+        // Get the group and type of import
+        $this->gatherUserInput();
 
-        $this->variableFolders = "{$this->group}/{$this->type}";
-
+        // Get the folder and file(s) to import
         $this->askForFolder();
         $this->askForFile();
 
-        if ($this->confirm("Are you ready to launch the importation process?")) {
+        // Start the importation
+        if ($this->option('skip-confirm') !== null || $this->confirm("Are you ready to launch the importation process?")) {
             $this->startTasks();
             $this->comment("We're done extracting!");
         }
     }
 
+    /**
+     * Starts the importation tasks.
+     *
+     * @return void
+     */
     public function startTasks()
     {
         $this->toExtract->each(function ($file) {
-            $this->info("Starting to processing {$file}");
+            $this->info("Dispatching importation of {$file}");
             $pathToFile = $this->paths->get('system')->extraction."/{$this->variableFolders}/{$this->folder}/{$file}";
-
-            $epfImport = new EPFFileImporter($pathToFile);
-            $epfImport->startImport();
-
-            $this->comment("Finished this file. I've imported or updated {$epfImport->totalRows} rows in {$epfImport->duration} seconds ⏱");
-
-            if ($this->confirm("Would you like to deleted the file, now that it's been imported?")) {
-                Storage::delete($this->paths->get('storage')->extraction."/{$this->variableFolders}/{$this->folder}/{$file}");
-            }
+            ImportJob::dispatch(
+                $pathToFile,
+                $this->group,
+                $this->type,
+                $this->option('delete') ?? $this->confirm("Would you like to deleted the file, now that it's been imported?")
+            )->onQueue(config('apple-epf.queue'));
         });
     }
 
+    /**
+     * Asks for which folder to import from.
+     *
+     * @return void
+     */
     public function askForFolder()
     {
-        $folderChoice = collect(Storage::directories($this->paths->get('storage')->extraction."/{$this->variableFolders}"))->map(function ($path) {
+        // Get the folders
+        $folderChoice = collect(Storage::directories($this->paths->get('storage')->extraction."/{$this->variableFolders}"))
+            ->map(function ($path) {
+                return collect(explode('/', $path))->last();
+            })->toArray();
 
-            $paths = collect(explode('/', $path));
-            return $paths->last();
-        })->toArray();
-
-        if (count($folderChoice) == 0) {
-            die("Can't find any directory for files with those choices, did you download and extract the files first?");
+        if (count($folderChoice) === 0) {
+            $this->error('Can\'t find any directory for files with those choices, did you download and extract the files first?');
+            exit;
         }
 
-        $this->folder = $this->choice('Of which folder do you wish to start the import?', $folderChoice, 0);
+        $this->folder = $this->option('folder') ?? $this->choice('Of which folder do you wish to start the import?', $folderChoice, 0);
     }
 
+    /**
+     * Asks for which file to import from.
+     *
+     * @return void
+     */
     public function askForFile()
     {
-        $listOfFiles = collect(Storage::files($this->paths->get('storage')->extraction."/{$this->variableFolders}/{$this->folder}"))->map(function ($path) {
+        $listOfFiles = collect(Storage::files($this->paths->get('storage')->extraction."/{$this->variableFolders}/{$this->folder}"))
+            ->map(function ($path) {
+                return collect(explode('/', $path))->last();
+            })->toArray();
 
-            $paths = collect(explode('/', $path));
-            return $paths->last();
-        })->toArray();
-
-        if (count($listOfFiles) == 0) {
+        if (count($listOfFiles) === 0) {
             die("Can't find files for those choices, there was probably an error with the extraction or archive.");
         }
 
         $extractChoices = array_merge(['all'], $listOfFiles);
 
-        $toExtract = $this->choice('Which file do you want to extract?', $extractChoices, 0);
+        $toExtract = $this->option('file') ?? $this->choice('Which file do you want to extract?', $extractChoices, 0);
+
         $this->toExtract = $toExtract == "all" ? $listOfFiles : $toExtract;
         $this->toExtract = collect($this->toExtract);
     }

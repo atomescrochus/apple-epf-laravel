@@ -1,62 +1,181 @@
 <?php
 
-namespace Atomescrochus\EPF;
+namespace Appwapp\EPF;
 
-use Carbon\Carbon;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
+use Illuminate\Database\QueryException;
+use Appwapp\EPF\Exceptions\ModelNotFoundException;
+use Appwapp\EPF\Exceptions\TableNotFoundException;
 
 class EPFFileImporter
 {
-    protected $file;
-    protected $connection;
-    protected $specialChars;
-    protected $exportType;
-    protected $columns;
-    protected $primaryKeys;
-    public $duration;
-    public $totalRows;
+    /**
+     * The file to import.
+     *
+     * @var SplFileObject
+     */
+    protected ?\SplFileObject $file;
 
-    public function __construct($file)
+    /**
+     * The connection name.
+     *
+     * @var string
+     */
+    protected string $connection;
+
+    /**
+     * The number of chunks to cut the transaction.
+     *
+     * @var int
+     */
+    protected int $chunks;
+
+    /**
+     * The special characters used in EPF feeds.
+     *
+     * @var object
+     */
+    protected object $specialChars;
+
+    /**
+     * Type of the export.
+     *
+     * @var string
+     */
+    protected string $exportType;
+
+    /**
+     * Collection of columns.
+     *
+     * @var \Illuminate\Support\Collection
+     */
+    protected Collection $columns;
+
+    /**
+     * Collection of primary keys.
+     *
+     * @var \Illuminate\Support\Collection
+     */
+    protected Collection $primaryKeys;
+
+    /**
+     * Duration in seconds.
+     *
+     * @var int
+     */
+    public int $duration;
+
+    /**
+     * Total rows imported.
+     *
+     * @var int
+     */
+    public int $totalRows;
+
+    /**
+     * Wether the file was skipped or not.
+     *
+     * @var bool
+     */
+    public bool $skipped = false;
+
+    /**
+     * Group to import to.
+     *
+     * @var string
+     */
+    protected string $group;
+
+    /**
+     * The model classname
+     *
+     * @var string
+     */
+    protected string $model;
+
+    /**
+     * Constructs a new instance.
+     *
+     * @param  string  $file  The file to import
+     * @param  string  $group The group to import to
+     */
+    public function __construct(string $file, string $group)
     {
+        // Setup the special characters
         $this->specialChars = (object) [
-            'fs' => "\x01", // field separator
-            'rs' => "\x02\n", // record separator
-            'co' => "#", // comments delimiter,
-            'le' => "##legal", // legal comments delimiter
+            'field_separator'    => "\x01",
+            'record_separator'   => "\x02\n",
+            'comments_delimiter' => "#",
+            'legal'              => "##legal",
         ];
-        $this->connection = 'apple-epf';
-        $this->totalRows = 0;
 
-        $this->file = new \SplFileObject($file);
-        $this->getRelevantInformationFromFile();
-        $this->checkForTable();
+        // Get the connection from the configuration
+        $this->connection = config('apple-epf.database_connection');
+        $this->chunks     = config('apple-epf.database_importation_chunks');
+        $this->totalRows  = 0;
+
+        // Get the file
+        $this->group = $group;
+        $this->file  = new \SplFileObject($file);
+
+        // Fetch the model based on the file name and group
+        $this->model = 'Appwapp\EPF\Models\\'. Str::studly($this->group)  .'\\' . Str::studly($this->file->getFilename());
+
+        // Remove any number in case of multiple files per model
+        $this->model = preg_replace('/[0-9]*/', '', $this->model);
     }
 
-    public function startImport()
+    /**
+     * Starts the importation.
+     *
+     * @return void
+     */
+    public function startImport(): void
     {
+        // Get the file relevant information
+        $this->getRelevantInformationFromFile();
+
+        // Verifies the dynamic model and 
+        // checks if it needs to be ignored
+        if ($this->verifyModel() === false) {
+            // Ignore the model, return as done
+            $this->skipped = true;
+            return;
+        }
+
         $start = Carbon::now();
-        // fetch the model based on the file name
-        $model = "Atomescrochus\EPF\Models\iTunes\\";
-        $model .= studly_case($this->file->getFilename());
 
         $this->file->seek(0);
 
-        while (!$this->file->eof()) {
-            $line = $this->file->fgets();
-        
-            if ($line != "" && !str_contains($line, "#")) {
-                //a.k.a not the last, or a comment
-                
-                $line = str_replace($this->specialChars->rs, "", $line); // remove record separator
-                $values = explode($this->specialChars->fs, $line); // divide values
+        // Begin the database transaction
+        DB::connection($this->connection)->beginTransaction();
+
+        try {
+            while (! $this->file->eof()) {               
+                $line = $this->file->fgets();
+
+                // Skips end of file or comments
+                if ($line === "" || str_starts_with($line, "#")) {
+                    continue;
+                }
+
+                // Read line until a record separator is found
+                // Can happen if a value contains a line feed \n
+                while (strpos($line, $this->specialChars->record_separator) === false && ! $this->file->eof()) {
+                    $line .= $this->file->fgets();
+                }
+
+                $line    = str_replace($this->specialChars->record_separator, "", $line); // remove record separator
+                $values  = explode($this->specialChars->field_separator, $line); // divide values
                 $columns = collect($this->columns->keys());
-                $data = collect();
+                $data    = collect();
 
                 $columns->each(function ($name, $key) use ($data, $values) {
-                    $value = empty($values[$key]) ? null : $values[$key];
-                    $data->put($name, $value);
+                    $data->put($name, $values[$key] !== '' ? $values[$key] : null);
                 });
 
                 $data = $data->map(function ($item, $key) {
@@ -67,95 +186,150 @@ class EPFFileImporter
                     return $item;
                 });
 
-                $primaryKey = [$this->primaryKeys->first() => $data->pull($this->primaryKeys->first())];
+                // Generate the composite or single primary key
+                $primaryKeys = [];
+                foreach ($this->primaryKeys->all() as $primaryKey) {
+                    $primaryKeys[$primaryKey] = $data->pull($primaryKey);
+                }
 
-                $row = $model::updateOrCreate(
-                    $primaryKey,
-                    $data->toArray()
-                );
-
+                // Either update or create via the model
+                $this->model::updateOrCreate($primaryKeys, $data->toArray());
                 $this->totalRows++;
+
+                // Commit the transaction by chunks
+                // To not go over the database insert limit if any
+                if ($this->totalRows % $this->chunks === 0) { 
+                    DB::connection($this->connection)->commit();
+                }
             }
+
+            // Do a last commit after the loop to commit the remainder
+            DB::connection($this->connection)->commit();
+        } catch (QueryException $exception) {
+            DB::connection($this->connection)->rollBack();
+            throw $exception;
         }
 
-        $this->file = null;
+        $this->file     = null;
         $this->duration = $start->diffinSeconds(Carbon::now());
-    }
+    }   
 
-    private function getRelevantInformationFromFile()
+    /**
+     * Gets the relevant information from the file.
+     *
+     * @return void
+     */
+    private function getRelevantInformationFromFile(): void
     {
-        while (!$this->file->eof()) {
+        while (! $this->file->eof()) {
             $line = $this->file->fgets(); // get the line
-            $line = str_replace($this->specialChars->rs, "", $line); // remove record separator, we already read line by line anyway
-
-            if ($this->file->key() == 0) {
-                // first line, column names
-                $this->getColumnNames($line);
-            }
+            $line = str_replace($this->specialChars->record_separator, "", $line); // remove record separator, we already read line by line anyway
 
             if ($this->file->key() == 1) {
-                // second line, primary key
-                $this->getPrimaryKey($line);
+                // first line, column names
+                $this->setColumnNames($line);
             }
 
             if ($this->file->key() == 2) {
+                // second line, primary key
+                $this->setPrimaryKey($line);
+            }
+
+            if ($this->file->key() == 3) {
                 // third line, columns types
                 $this->setColumnTypes($line);
             }
 
-            if ($this->file->key() == 3) {
+            if ($this->file->key() == 4) {
                 // fourth line, export type
-                $this->getExportType($line);
+                $this->setExportType($line);
             }
 
-            if ($line[0] != $this->specialChars->co) {
+            if ($line[0] != $this->specialChars->comments_delimiter) {
                 break;
             }
         }
     }
 
-    private function checkForTable()
+    /**
+     * Verifies if the model exists, if the model should be
+     * included in the import and if the table exists.
+     *
+     * @throws ModelNotFoundException
+     * @throws TableNotFoundException
+     * 
+     * @return bool
+     */
+    private function verifyModel(): bool
     {
-        $tableName = $this->file->getFilename();
-        $tableExists = Schema::connection($this->connection)->hasTable($tableName);
-
-        if (!$tableExists) {
-            $primaryKeys = implode(",", $this->primaryKeys->toArray());
-            $columns = collect();
-
-            $this->columns->each(function ($type, $name) use ($columns) {
-                $columns->push("{$name} {$type}");
-            });
-
-            $columns = implode(", ", $columns->toArray());
-            $sql = "CREATE TABLE {$tableName} ({$columns}, PRIMARY KEY($primaryKeys));";
-
-            DB::connection($this->connection)->statement($sql);
+        // Check if model exists
+        if (! class_exists($this->model)) {
+            throw new ModelNotFoundException("Model '{$this->model}' does not exists. Make sure 'apple-epf-laravel' is up to date.");
         }
+
+        // Check if model is included in config
+        if (! in_array($this->model, config('apple-epf.included_models'))) {
+            return false;
+        }
+
+        // Make sure the table exists, a.k.a. migrations have been run
+        $tableName = $this->model::getTableName();
+        if (! Schema::connection($this->connection)->hasTable($tableName)) {
+            throw new TableNotFoundException("The `{$tableName}` table was not found in the '{$this->connection}' connection. Please run the 'apple-epf-laravel' migrations or adjust the configuration.");
+        }
+
+        return true;
     }
 
-    private function getExportType($line)
+    /**
+     * Sets the export type.
+     *
+     * @param  string $line
+     *
+     * @return void
+     */
+    private function setExportType(string $line): void
     {
         $this->exportType = str_replace("#exportMode:", "", $line); // remove comment character and info
     }
 
-    private function getPrimaryKey($line)
+    /**
+     * Sets the primary key.
+     *
+     * @param  string $line
+     *
+     * @return void
+     */
+    private function setPrimaryKey(string $line): void
     {
-        
-        $line = str_replace("#primaryKey:", "", $line); // remove comment character and info
-        $this->primaryKeys = collect(explode($this->specialChars->fs, $line));
+        $line       = str_replace("#primaryKey:", "", $line); // remove comment character and info
+        $this->primaryKeys = collect(explode($this->specialChars->field_separator, $line));
     }
 
-    private function getColumnNames($line)
+    /**
+     * Sets the column names.
+     * 
+     * @param string $line
+     *
+     * @return void
+     */
+    private function setColumnNames(string $line): void
     {
-        $line = substr($line, 1); // remove comment character
-        $this->columns = collect(explode($this->specialChars->fs, $line));
+        $line   = substr($line, 1); // remove comment character
+        $this->columns = collect(explode($this->specialChars->field_separator, $line));
     }
 
-    private function setColumnTypes($line)
+    /**
+     * Sets the column types.
+     *
+     * @param  string $line
+     *
+     * @return void
+     */
+    private function setColumnTypes(string $line): void
     {
-        $line = str_replace("#dbTypes:", "", $line); // remove comment character and info
-        $line = collect(explode($this->specialChars->fs, $line));
+        $line    = str_replace("#dbTypes:", "", $line); // remove comment character and info
+        $line    = collect(explode($this->specialChars->field_separator, $line));
 
         $columns = collect([]);
 
