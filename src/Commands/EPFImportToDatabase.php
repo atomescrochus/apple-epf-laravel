@@ -30,10 +30,25 @@ class EPFImportToDatabase extends EPFCommand
      */
     protected $description = 'This will help import data from files downloaded, then extracted, to database.';
 
+    /**
+     * The paths.
+     *
+     * @var object
+     */
     private $paths;
 
+    /**
+     * The folder to import from.
+     *
+     * @var string
+     */
     private $folder;
 
+    /**
+     * The files to extract from.
+     *
+     * @var array
+     */
     private $toExtract;
 
     /**

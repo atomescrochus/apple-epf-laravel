@@ -21,7 +21,8 @@ class EPFDownloader extends EPFCommand
     protected $signature = 'epf:download
         {--type= : the type of import, either "full", or "incremental"}
         {--group= : the group of import, either "itunes", "match", "popularity" or "pricing"}
-        {--skip-confirm : skip the confirmation prompt}';
+        {--skip-confirm : skip the confirmation prompt}
+        {--chain-jobs : chain the next jobs after the download}';
 
     /**
      * The console command description.
@@ -38,6 +39,20 @@ class EPFDownloader extends EPFCommand
     private EPFCrawler $epf;
 
     /**
+     * The paths.
+     *
+     * @var object
+     */
+    private $paths;
+
+    /**
+     * The credentials.
+     *
+     * @var object
+     */
+    private $credentials;
+
+    /**
      * Create a new command instance.
      *
      * @return void
@@ -46,9 +61,8 @@ class EPFDownloader extends EPFCommand
     {
         parent::__construct();
 
-        $this->credentials     = $this->getCredentials();
-        $this->paths           = $this->getEPFFilesPaths();
-        $this->md5ChecksFailed = false;
+        $this->credentials = $this->getCredentials();
+        $this->paths       = $this->getEPFFilesPaths();
     }
 
     /**
@@ -90,7 +104,7 @@ class EPFDownloader extends EPFCommand
 
         $links->each(function ($link) {
             $this->line("");
-            $filename = basename($link);           
+            $filename = basename($link);
 
             // Fetch the model based on the file name and group
             $model = 'Appwapp\EPF\Models\\'. Str::studly($this->group)  .'\\' . Str::studly(Str::replace('.tbz', '', $filename));

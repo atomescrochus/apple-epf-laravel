@@ -29,6 +29,11 @@ class EPFExtractor extends EPFCommand
      */
     protected $description = 'Extract the EPF files downloaded from epf:download.';
 
+    /**
+     * The paths.
+     *
+     * @var object
+     */
     private $paths;
 
     /**

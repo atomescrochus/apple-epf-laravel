@@ -1,5 +1,6 @@
 {
     "name": "appwapp/apple-epf-laravel",
+    "version": "0.4",
     "description": "Provides models and other tools to use Apple's EPF in Laravel.",
     "keywords": [
         "atomescrochus",
