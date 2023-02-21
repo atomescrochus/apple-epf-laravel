@@ -44,7 +44,7 @@ To publish the configuration to your app, execute the following command:
 php artisan vendor:publish --tag=apple-epf-config
 ```
 
-Then you should edit the configuration to only include the data you need. The Apple EPF data is **a lot**, we suggest only using what you need by commenting the models your don't need.
+Then you should edit the configuration to only include the data you need. The Apple EPF data is **a lot**, we suggest only using what you need by commenting the models you don't need.
 
 ```php
     'included_models' => [
@@ -98,7 +98,7 @@ If you want to only use the provided models to your own database, just autoload 
 
 If you don't have your data yet, you can, if you provided your credentials to access the EPF feed to the `.env` file, use the following artisan commands:
 
-- `php artisan epf:download` will help your download the files;
+- `php artisan epf:download` will help you download the files;
 - `php artisan epf:extract` will extract the downloaded files;
 - `php artisan epf:import` will import the data to database using the configured connection, using the provided models.
 
