@@ -1,41 +1,72 @@
 # Integrate Apple's EPF in Laravel
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/atomescrochus/apple-epf-laravel.svg?style=flat-square)](https://packagist.org/packages/atomescrochus/apple-epf-laravel)
-[![Total Downloads](https://img.shields.io/packagist/dt/atomescrochus/apple-epf-laravel.svg?style=flat-square)](https://packagist.org/packages/atomescrochus/apple-epf-laravel)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/appwapp/apple-epf-laravel.svg?style=flat-square)](https://packagist.org/packages/appwapp/apple-epf-laravel)
+[![Total Downloads](https://img.shields.io/packagist/dt/appwapp/apple-epf-laravel.svg?style=flat-square)](https://packagist.org/packages/appwapp/apple-epf-laravel)
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.md)
-[![Build Status](https://img.shields.io/travis/atomescrochus/apple-epf-laravel/master.svg?style=flat-square)](https://travis-ci.org/atomescrochus/apple-epf-laravel)
 
 *Work in progress. While I do not recommend using in production yet, things should be working as advertised.*
 
-This package provides models and other tools to use Apple's Enterprise Partner Feed (EPF) in Laravel.
+This package provides models and other tools to use [Apple's Enterprise Partner Feed (EPF) v5](https://feeds.itunes.apple.com/feeds/epf/v5) in Laravel.
 
-**This package do not provides EPF data, you will still have to download your own files.**
+**This package do not provides EPF data, you will still have to download your own files with your partner account.**
 
 ## Installation
 
-You can install the package via composer:
+You can install the package via composer (not yet available):
 
 ```bash
-composer require atomescrochus/apple-epf-laravel
+composer require appwapp/apple-epf-laravel
 ```
 
 Then you have to install the package' service provider, _unless you are running Laravel >=5.5_ (it'll use package auto-discovery) :
 
 ```php
 'providers' => [
-    ...
+    // ...
 
-    Atomescrochus\EPF\EPFServiceProvider::class
+    Appwapp\EPF\EPFServiceProvider::class
 
-    ....
+    // ...
 ]
 ```
 
-You will *have to* add another connection to your `config/database.php` file, this package will be looking for it. You can of course use the same credential as your main database, but to my experience, since EPF database is pretty huge, it's a good idea to keep things separate, it just make things easier.
+The package requires the following in your `.env` file in order to download the Apple's EPF files:
+
+```env
+EPF_USER_ID=
+EPF_PASSWORD=
+```
+
+
+To publish the configuration to your app, execute the following command:
+
+```text
+php artisan vendor:publish --tag=apple-epf-config
+```
+
+Then you should edit the configuration to only include the data you need. The Apple EPF data is **a lot**, we suggest only using what you need by commenting the models your don't need.
+
+```php
+    'included_models' => [
+        Appwapp\EPF\Models\Itunes\Application::class,
+        Appwapp\EPF\Models\Itunes\ApplicationDetail::class,
+        Appwapp\EPF\Models\Itunes\ApplicationDeviceType::class,
+
+        // ...
+    ]
+```
+
+To publish the migrations to your app, execute this:
+
+```text
+php artisan vendor:publish --tag=apple-epf-migrations
+```
+
+**Important:** The migrations will be dynamicly filtered with your configuration of `included_models`, make sure your `config/apple-epf.php` is published and edited before publishing the migrations.
+
+By default, you will have to add another connection to your `config/database.php` file called `apple-epf`, this package will be looking for it. You can of course use the same credential as your main database, but to my experience, since EPF database is pretty huge, it's a good idea to keep things separate, it just make things easier. If you want to use another database connection then `apple-epf`, you can configure it in the `config/apple-epf.php` file.
 
 Below, you'll find the template of the connection to add. You can see we're using the `.env` file to set the connection infos, if necessary. You will have to add those variables to your own `.env`, don't forget!
-
-**This package's models will be looking for the connection with the name "apple-epf", do not change the connection name ot you will break things!**
 
 ```php
 <?php // File: /config/database.php
@@ -69,13 +100,36 @@ If you don't have your data yet, you can, if you provided your credentials to ac
 
 - `php artisan epf:download` will help your download the files;
 - `php artisan epf:extract` will extract the downloaded files;
-- `php artisan epf:import` will import the data to database using the `apple-epf` connection, using the provided models.
+- `php artisan epf:import` will import the data to database using the configured connection, using the provided models.
 
-**Be careful, you can use the `all` option when prompted while using the artisan command, but it's not advisable. The archives are huge, extracted files are huge, and the data in the database will be taking a lot of space also.** You should really try to import in parts as much as you can, so you can remove unecessary files to free up some space so you can finish the rest of the imports...
+Each command will dispatch jobs, depending on your needs, you should edit your queue configuration and queue workers.
+
+By default, every command will prompt for additional information for you to choose, but each command can also be run with parameters to be able to run them in a cron or programatically:
+|command|parameter|description|
+|-------|---------|-----------|
+|`epf:download`|`--type`|the type of import, either `full`, or `incremental`|
+||`--group`| the group of import, either `itunes`, `match`, `popularity` or `pricing`|
+||`--skip-confirm`| skips the confirmation prompt|
+||`--chain-jobs`| chain the next jobs after the download|
+|`epf:extract`|`--type`|the type of import, either `full`, or `incremental`|
+||`--group`| the group of import, either `itunes`, `match`, `popularity` or `pricing`|
+||`--file`| the file you want to extract, either `all` or the file path you want to extract|
+||`--skip-confirm`| skips the confirmation prompt|
+||`--delete`| delete the archive after extraction|
+|`epf:import`|`--type`|the type of import, either `full`, or `incremental`|
+||`--group`| the group of import, either `itunes`, `match`, `popularity` or `pricing`|
+||`--folder`| the folder name to import from, ex: `itunes20230115`|
+||`--file`| the file you want to import, either `all` or the file you want to import|
+||`--skip-confirm`| skips the confirmation prompt|
+||`--delete`| deletes the file once imported|
+
+**Be careful, you can use the `all` option while using the artisan commands, but it's not advisable. The archives are huge, extracted files are huge, and the data in the database will be taking a lot of space.** You should really try to import in parts as much as you can, so you can remove unecessary files to free up some space so you can finish the rest of the imports.
 
 ## Contributing
 
-Contributions are welcome, [thanks to y'all](https://github.com/atomescrochus/apple-epf-laravel/graphs/contributors) :)
+Feel free to contribute, we expect some standards to be used. See [contributing](CONTRIBUTING.md).
+
+This package was forked from [atomescrochus/apple-epf-laravel](https://github.com/atomescrochus/apple-epf-laravel), thanks to the [original contributors](https://github.com/atomescrochus/apple-epf-laravel/graphs/contributors)!
 
 ## License
 
