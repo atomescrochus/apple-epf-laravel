@@ -168,5 +168,28 @@ return [
         Appwapp\EPF\Models\Pricing\CollectionPrice::class,
         Appwapp\EPF\Models\Pricing\SongPrice::class,
         Appwapp\EPF\Models\Pricing\VideoPrice::class,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Filter imported data
+    |--------------------------------------------------------------------------
+    |
+    | The apple EPF feeds are extremely big. Millions of rows are imported with 
+    | the full feed. If you use only a fraction of the data, we highly suggest
+    | to filter only the data you need in the tables you included.
+    |
+    | Determine the filtering rules. The package will "pluck" the itunes IDs out 
+    | of your own models and use it to filter the data. Cache will also be used 
+    | so the collection of IDs are only fetched once per importation.
+    |
+    | This filter will have no effect if the model is not included in 'included_models'.
+    |
+    | Model supported:
+    | - Appwapp\EPF\Models\Itunes\Artist::class
+    |
+    */
+    'filter_by' => [
+        // Appwapp\EPF\Models\Itunes\Artist::class => [App\Models\Palmares\Artist::class, 'itunes_id']
     ]
 ];
