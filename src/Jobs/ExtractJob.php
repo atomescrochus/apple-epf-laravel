@@ -73,18 +73,27 @@ class ExtractJob implements ShouldQueue
 
         $extractor = Zippy::load();
         $archive   = $extractor->open($this->file, '.tar.bz2');
-        $archive->extract($this->paths->get('system')->extraction."/{$this->variableFolders}");
+
+        Storage::makeDirectory($this->paths->get('storage')->extraction . "/{$this->variableFolders}");
+        $archive->extract($this->paths->get('system')->extraction . "/{$this->variableFolders}");
         Log::debug("Extraction of {$filename} completed.");
 
         if ($this->shouldDelete) {
-            Storage::delete($this->paths->get('storage')->archive."/{$this->variableFolders}/{$filename}");
+            Storage::delete($this->paths->get('storage')->archive . "/{$this->variableFolders}/{$filename}");
             Log::debug("{$filename} deleted.");
         }
 
-        // Chain the extract job
+        // Chain the import job
         if (config('apple-epf.chain_jobs')) {
+            $extractedFilename = str_replace('.tbz', '', $filename);
+
+            // Find the last extracted folder
+            $folders         = collect(Storage::directories($this->paths->get('storage')->extraction . "/{$this->variableFolders}/"));
+            $extractedFolder = basename($folders->last(fn ($folder) => str_contains($folder, $this->group)));
+
+            // Dispatch the import job
             ImportJob::dispatch(
-                $this->paths->get('storage')->archive."/{$this->variableFolders}/{$filename}",
+                $this->paths->get('system')->extraction . "/{$this->variableFolders}/$extractedFolder/$extractedFilename",
                 $this->group,
                 $this->type,
                 $this->shouldDelete

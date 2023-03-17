@@ -93,10 +93,9 @@ class DownloadJob implements ShouldQueue
     public function handle ()
     {
         $this->download($this->link);
-        $this->md5Check($this->link);
         
         // Chain the extract job
-        if (config('apple-epf.chain_jobs')) {
+        if ($this->md5Check($this->link) && config('apple-epf.chain_jobs')) {
             ExtractJob::dispatch($this->file, $this->group, $this->type)->onQueue(config('apple-epf.queue'));
         }
     }

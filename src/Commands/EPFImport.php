@@ -6,7 +6,7 @@ use Appwapp\EPF\Jobs\ImportJob;
 use Appwapp\EPF\Traits\FileStorage;
 use Illuminate\Support\Facades\Storage;
 
-class EPFImportToDatabase extends EPFCommand
+class EPFImport extends EPFCommand
 {
     use FileStorage;
 

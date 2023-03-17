@@ -20,9 +20,10 @@ class EPFServiceProvider extends ServiceProvider
             // Only load commands if included
             if (config('apple-epf.include_artisan_cmd')) {
                 $this->commands([
-                    Commands\EPFDownloader::class,
-                    Commands\EPFExtractor::class,
-                    Commands\EPFImportToDatabase::class,
+                    Commands\EPFDownload::class,
+                    Commands\EPFExtract::class,
+                    Commands\EPFImport::class,
+                    Commands\EPFPrune::class
                 ]);
             }
 

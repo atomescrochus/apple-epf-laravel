@@ -6,7 +6,7 @@ use Appwapp\EPF\Jobs\ExtractJob;
 use Appwapp\EPF\Traits\FileStorage;
 use Illuminate\Support\Facades\Storage;
 
-class EPFExtractor extends EPFCommand
+class EPFExtract extends EPFCommand
 {
     use FileStorage;
 

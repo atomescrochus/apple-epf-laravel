@@ -9,7 +9,7 @@ use Appwapp\EPF\Traits\FeedCredentials;
 use Appwapp\EPF\Traits\FileStorage;
 use Illuminate\Support\Str;
 
-class EPFDownloader extends EPFCommand
+class EPFDownload extends EPFCommand
 {
     use FeedCredentials, FileStorage;
 

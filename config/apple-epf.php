@@ -109,6 +109,9 @@ return [
     | helps to only migrate the needed tables and to only import the right models.
     |
     | To exclude a model AND the migration, comment or remove any of the models below.
+    |     |
+    | Appwapp\EPF\Models\Itunes\KeyValue::class should always be used, as it is used
+    | for pruning old data when ingesting a full feed.
     |
     */
     'included_models' => [

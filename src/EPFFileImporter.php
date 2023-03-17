@@ -155,7 +155,7 @@ class EPFFileImporter
         DB::connection($this->connection)->beginTransaction();
 
         try {
-            while (! $this->file->eof()) {               
+            while (! $this->file->eof()) {
                 $line = $this->file->fgets();
 
                 // Skips end of file or comments

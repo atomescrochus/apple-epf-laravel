@@ -19,7 +19,7 @@ class CreateAppleEpfArtistTable extends Migration
             $table->string('name', 1000);
             $table->string('search_terms', 1000)->nullable();
             $table->boolean('is_actual_artist');
-            $table->string('view_url', 1000);
+            $table->text('view_url');
             $table->unsignedInteger('artist_type_id');
         });
     }
