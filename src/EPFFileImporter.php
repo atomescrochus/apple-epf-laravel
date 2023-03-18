@@ -98,6 +98,13 @@ class EPFFileImporter
     protected string $model;
 
     /**
+     * The filtered IDs collection.
+     * 
+     * @var \Illuminate\Support\Collection
+     */
+    protected Collection $filteredIds;
+
+    /**
      * Constructs a new instance.
      *
      * @param  string  $file  The file to import
@@ -147,6 +154,9 @@ class EPFFileImporter
             return;
         }
 
+        // Check if current model's data should be filtered
+        $this->initializeFilters();
+
         $start = Carbon::now();
 
         $this->file->seek(0);
@@ -192,8 +202,20 @@ class EPFFileImporter
                     $primaryKeys[$primaryKey] = $data->pull($primaryKey);
                 }
 
+                $modelData = $data->toArray();
+
+                // Check filters
+                if ($this->filteredIds->isNotEmpty()) {
+                    $id = $this->primaryKeys->first();
+
+                    // If the identifier is not in the filtered IDs, skip it
+                    if (! $this->filteredIds->contains($id)) {
+                        continue;
+                    }
+                }
+
                 // Either update or create via the model
-                $this->model::updateOrCreate($primaryKeys, $data->toArray());
+                $this->model::updateOrCreate($primaryKeys, $modelData);
                 $this->totalRows++;
 
                 // Commit the transaction by chunks
@@ -338,5 +360,30 @@ class EPFFileImporter
         }
 
         $this->columns = $columns;
+    }
+
+    /**
+     * Initialize the filters for this import.
+     *
+     * @return bool
+     */
+    private function initializeFilters (): bool
+    {
+        // Get the configured filters
+        $filteredBy = config('apple-epf.filtered_by');
+
+        // Check if current model should be filtered or not
+        if (! in_array($this->model, $filteredBy)) {
+            $this->filteredIds = collect([]);
+            return false;
+        }
+
+        // Load the configured models
+        $configuredModel = $filteredBy[$this->model][0];
+        $configuredAttr  = $filteredBy[$this->model][1];
+
+        // Get the filter IDs collection
+        $this->filteredIds = $configuredModel::get()->pluck($configuredAttr);
+        return true;
     }
 }
