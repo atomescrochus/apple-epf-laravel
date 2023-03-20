@@ -3,13 +3,14 @@
 namespace Appwapp\EPF\Models\Itunes;
 
 use Appwapp\EPF\Models\EPFModel;
-
+use Appwapp\EPF\Traits\Filterable;
 use Appwapp\EPF\Traits\HasSearchTerms;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Collection as LaravelCollection;
 
 class Collection extends EPFModel
 {
-    use HasSearchTerms;
+    use Filterable, HasSearchTerms;
 
     /**
      * The table associated with the model.
@@ -61,6 +62,16 @@ class Collection extends EPFModel
     ];
 
     /**
+     * Gets the Collection's artists
+     *
+     * @return BelongsToMany
+     */
+    public function artistCollection (): BelongsToMany
+    {
+        return $this->belongsToMany(ArtistCollection::class, 'artist_collection', 'collection_id', 'artist_id');
+    }
+
+    /**
      * Get the Collection's genres
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
@@ -78,5 +89,35 @@ class Collection extends EPFModel
     public function getPrimaryGenreAttribute(): ?Genre
     {
         return $this->genres()->where('is_primary', 1)->first();
+    }
+
+    /**
+     * Get the filtered identifiers.
+     *
+     * @return Collection
+     */
+    protected function getFilteredIds(): ?LaravelCollection
+    {
+        return $this->artistCollection()->get()->pluck('collection_id');
+    }
+
+    /**
+     * Get the filtered attribute.
+     *
+     * @return string
+     */
+    protected function getFilteredAttribute(): string
+    {
+        return 'collection_id';
+    }
+
+    /**
+     * Get the filtered relation.
+     *
+     * @return string
+     */
+    protected function getFilteredRelation(): string
+    {
+        return 'artist_collection';
     }
 }

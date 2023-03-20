@@ -190,6 +190,9 @@ return [
     |
     */
     'filter_by' => [
-        // Appwapp\EPF\Models\Itunes\Artist::class => [App\Models\Palmares\Artist::class, 'itunes_id']
+        Appwapp\EPF\Models\Itunes\Artist::class => [
+            'model'     => App\Models\Palmares\Artist::class, 
+            'attribute' => 'itunes_id'
+        ]
     ]
 ];

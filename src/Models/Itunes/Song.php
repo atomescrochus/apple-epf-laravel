@@ -3,13 +3,14 @@
 namespace Appwapp\EPF\Models\Itunes;
 
 use Appwapp\EPF\Models\EPFModel;
-
+use Appwapp\EPF\Traits\Filterable;
 use Appwapp\EPF\Traits\HasSearchTerms;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Collection;
 
 class Song extends EPFModel
 {
-    use HasSearchTerms;
+    use Filterable, HasSearchTerms;
 
     /**
      * The table associated with the model.
@@ -57,5 +58,45 @@ class Song extends EPFModel
     public function collections(): BelongsToMany
     {
         return $this->belongsToMany(Collection::class, 'collection_song', 'song_id', 'collection_id');
+    }
+
+    /**
+     * Gets the Song's artist_song
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function artistSong(): BelongsToMany
+    {
+        return $this->belongsToMany(ArtistSong::class, 'artist_song', 'song_id', 'artist_id');
+    }
+
+    /**
+     * Get the filtered identifiers.
+     *
+     * @return Collection
+     */
+    protected function getFilteredIds(): ?Collection
+    {
+        return $this->artistSong()->get()->pluck('song_id');
+    }
+
+    /**
+     * Get the filtered attribute.
+     *
+     * @return string
+     */
+    protected function getFilteredAttribute(): string
+    {
+        return 'song_id';
+    }
+
+    /**
+     * Get the filtered relation.
+     *
+     * @return string
+     */
+    protected function getFilteredRelation(): string
+    {
+        return 'artist_song';
     }
 }
