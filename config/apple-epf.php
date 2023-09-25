@@ -190,7 +190,7 @@ return [
     |
     */
     'filter_by' => [
-        Appwapp\EPF\Models\Itunes\Artist::class => [
+        Appwapp\EPF\Filters\ArtistFilter::class => [
             'model'     => App\Models\Palmares\Artist::class, 
             'attribute' => 'itunes_id'
         ]

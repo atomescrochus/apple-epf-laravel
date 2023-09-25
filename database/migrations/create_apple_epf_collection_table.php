@@ -26,9 +26,9 @@ class CreateAppleEpfCollectionTable extends Migration
             $table->dateTime('original_release_date');
             $table->dateTime('itunes_release_date');
             $table->string('label_studio', 1000)->nullable();
-            $table->string('content_provider', 1000)->nullable();
+            $table->string('content_provider_name', 1000)->nullable();
             $table->string('copyright', 1000)->nullable();
-            $table->string('pline', 1000)->nullable();
+            $table->string('p_line', 1000)->nullable();
             $table->unsignedBigInteger('media_type_id');
             $table->boolean('is_compilation');
             $table->unsignedBigInteger('collection_type_id');

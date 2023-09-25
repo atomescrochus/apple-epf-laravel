@@ -3,14 +3,13 @@
 namespace Appwapp\EPF\Models\Itunes;
 
 use Appwapp\EPF\Models\EPFModel;
-use Appwapp\EPF\Traits\Filterable;
 use Appwapp\EPF\Traits\HasSearchTerms;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Collection;
 
 class Song extends EPFModel
 {
-    use Filterable, HasSearchTerms;
+    use HasSearchTerms;
 
     /**
      * The table associated with the model.

@@ -2,6 +2,7 @@
 
 namespace Appwapp\EPF\Models\Itunes;
 
+use Appwapp\EPF\Filters\ArtistFilter;
 use Appwapp\EPF\Models\EPFModel;
 use Appwapp\EPF\Traits\Filterable;
 use Appwapp\EPF\Traits\HasSearchTerms;
@@ -57,16 +58,16 @@ class Artist extends EPFModel
     protected function getFilteredIds(): ?Collection
     {
         // Check if Artist is configured to be filtered
-        $filteredBy = config('apple-epf.filter_by');
-        if (!isset($filteredBy[self::class])) {
+        $filterBy = config('apple-epf.filter_by');
+        if (! isset($filterBy[ArtistFilter::class])) {
             return null;
         }
     
         // Get the filtered model
-        $model = $filteredBy[self::class]['model'];
+        $model = $filterBy[ArtistFilter::class]['model'];
 
         // Returns the filtered collection
-        return $model::get()->pluck($filteredBy[self::class]['attribute']);
+        return $model::get()->pluck($filterBy[ArtistFilter::class]['attribute']);
     }
 
     /**

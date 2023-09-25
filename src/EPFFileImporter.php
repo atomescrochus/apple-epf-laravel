@@ -4,11 +4,14 @@ namespace Appwapp\EPF;
 
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Database\QueryException;
 use Appwapp\EPF\Exceptions\ModelNotFoundException;
+use Appwapp\EPF\Traits\Filterable;
+use Appwapp\EPF\Filters\ArtistFilter;
 use Appwapp\EPF\Exceptions\TableNotFoundException;
 
 class EPFFileImporter
@@ -100,9 +103,16 @@ class EPFFileImporter
     /**
      * The filtered IDs collection.
      * 
-     * @var \Illuminate\Support\Collection
+     * @var \Illuminate\Support\Collection|null
      */
-    protected Collection $filteredIds;
+    protected ?Collection $filteredIds;
+
+    /**
+     * The filter by attribute.
+     *
+     * @var string
+     */
+    protected ?string $filterBy;
 
     /**
      * Constructs a new instance.
@@ -154,6 +164,9 @@ class EPFFileImporter
             return;
         }
 
+        // Check if current model's data should be filtered
+        $this->initializeFilters();
+
         $start = Carbon::now();
 
         $this->file->seek(0);
@@ -162,6 +175,7 @@ class EPFFileImporter
         DB::connection($this->connection)->beginTransaction();
 
         try {
+            $startMicro = microtime(true);
             while (! $this->file->eof()) {
                 $line = $this->file->fgets();
 
@@ -199,14 +213,29 @@ class EPFFileImporter
                     $primaryKeys[$primaryKey] = $data->pull($primaryKey);
                 }
 
-                // Either update or create via the model
-                $this->model::updateOrCreate($primaryKeys, $data->toArray());
+                // Check if the model should be filtered
+                if ($this->filteredIds !== null && ! $this->filteredIds->contains($primaryKeys[$this->model::getFilteredAttribute()])) {
+                    // The model is filtered, so we don't want to create it
+                    continue;
+                }
+
+                if ($this->filterBy && isset($this->filterBy::$mapping[$this->model])) {
+                    // The model has a filter, so we want to use it
+                    $function = $this->filterBy::$mapping[$this->model];
+                    $this->filterBy::$function($primaryKeys, $data->toArray());
+                } else {
+                    // Either update or create via the model
+                    $this->model::updateOrCreate($primaryKeys, $data->toArray());
+                }
+                
                 $this->totalRows++;
 
                 // Commit the transaction by chunks
                 // To not go over the database insert limit if any
-                if ($this->totalRows % $this->chunks === 0) { 
+                if ($this->totalRows !== 0 && $this->totalRows % $this->chunks === 0) { 
                     DB::connection($this->connection)->commit();
+                    $end = microtime(true);
+                    $startMicro = microtime(true);
                 }
             }
 
@@ -271,7 +300,7 @@ class EPFFileImporter
     {
         // Check if model exists
         if (! class_exists($this->model)) {
-            throw new ModelNotFoundException("Model '{$this->model}' does not exists. Make sure 'apple-epf-laravel' is up to date.");
+            return false;
         }
 
         // Check if model is included in config
@@ -345,5 +374,26 @@ class EPFFileImporter
         }
 
         $this->columns = $columns;
+    }
+
+    /**
+     * Initialize the filters for this import.
+     *
+     * @return bool
+     */
+    private function initializeFilters (): bool
+    {
+        // Get the configured filters
+        $this->filterBy = ArtistFilter::class;
+
+        // Check if current model should be filtered or not
+        if (! in_array(Filterable::class, class_uses_recursive($this->model))) {
+            $this->filteredIds = null;
+            return false;
+        }
+
+        // Get the filter IDs collection
+        $this->filteredIds = $this->model::getFilteredIds();
+        return true;
     }
 }

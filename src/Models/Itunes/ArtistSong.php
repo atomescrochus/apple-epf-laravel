@@ -3,14 +3,13 @@
 namespace Appwapp\EPF\Models\Itunes;
 
 use Appwapp\EPF\Models\EPFModel;
-use Appwapp\EPF\Traits\Filterable;
 use Appwapp\EPF\Traits\HasCompositePrimaryKey;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Collection;
 
 class ArtistSong extends EPFModel
 {
-    use Filterable, HasCompositePrimaryKey;
+    use HasCompositePrimaryKey;
 
     /**
      * The table associated with the model.
